@@ -10,20 +10,24 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useApi, useAccount } from '@gear-js/react-hooks';
-
+import { readState } from '@/hooks/api'
+import { useProgramMetadata } from '@/hooks/api'
 export function  Home() {
   const { isApiReady } = useApi();
-  const { isAccountReady } = useAccount();
+  const { isAccountReady, account } = useAccount();
   const [poolName, setPoolName] = useState('')
   const [poolType, setPoolType] = useState('airdrop')
   const [initialAmount, setInitialAmount] = useState('')
   const [access, setAccess] = useState('public')
   const [distributionMode, setDistributionMode] = useState('manual')
   const [selectedPool, setSelectedPool] = useState('')
-  const [participants, setParticipants] = useState('')
+  const [participants, setParticipants] = useState<string[]>([]);
   const [distributionAddress, setDistributionAddress] = useState('')
   const [distributionType, setDistributionType] = useState('')
   const [distribution, setDistribution] = useState('')
+  const [newParticipant, setNewParticipant] = useState('')
+  console.log('../wasm/pool/pool.wasm')
+  useProgramMetadata('./pool.meta.hex')
 
   const pools = [
     { id: '1', name: 'Pool 1', type: 'Airdrop', creator: '0x1234...5678', participants: 100, transactions: 50 },
@@ -31,19 +35,35 @@ export function  Home() {
   ]
 
   const handleCreatePool = () => {
-    console.log('Creating pool:', { poolName, poolType, initialAmount, access, distributionMode })
+    try {
+
+      const state = readState(account?.address || 'user');
+      console.log('Estado del contrato leído:', state);
+      // Haz algo con el estado leído
+    } catch (error) {
+      console.error('Error al leer el estado:', error);
+    }
+    console.log('Creating pool:', { poolName, poolType, initialAmount, access, distributionMode, participants })
   }
 
-  const handleAddParticipants = () => {
-    console.log('Adding participants to pool:', selectedPool, 'Participants:', participants)
+  const handleAddParticipant = () => {
+    if (newParticipant.trim() === '') return;
+    setParticipants([...participants, newParticipant.trim()]);
+    setNewParticipant('');
   }
+  const handleRemoveParticipant = (index: number) => {
+    setParticipants(participants.filter((_, i) => i !== index));
+  }
+
 
   const handleCreateDistribution = () => {
+    
     console.log('Creating distribution:', {
       pool: selectedPool,
       address: distributionAddress,
       type: distributionType,
-      details: distribution
+      details: distribution,
+      participants_pool: participants
     })
   }
 
@@ -125,6 +145,27 @@ export function  Home() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-2">
+                <Label>Participantes</Label>
+                <div className="flex space-x-2">
+                  <Input
+                    value={newParticipant}
+                    onChange={(e) => setNewParticipant(e.target.value)}
+                    placeholder="Agregar dirección"
+                  />
+                  <Button onClick={handleAddParticipant}>Agregar</Button>
+                </div>
+                <ul className="list-disc pl-6">
+                  {participants.map((participant, index) => (
+                    <li key={index} className="flex items-center space-x-2">
+                      <span>{participant}</span>
+                      <Button variant="ghost" size="sm" onClick={() => handleRemoveParticipant(index)}>
+                        Eliminar
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </CardContent>
             <CardFooter>
               <Button onClick={handleCreatePool}>Crear Pool</Button>
@@ -152,12 +193,17 @@ export function  Home() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="participants">Direcciones de Participantes</Label>
-                <Input id="participants" value={participants} onChange={(e) => setParticipants(e.target.value)} placeholder="0x123..., 0x456..., ..." />
+              <Label htmlFor="participants">Direcciones de Participantes</Label>
+                <Input 
+                  id="participants" 
+                  value={newParticipant} 
+                  onChange={(e) => setNewParticipant(e.target.value)} 
+                  placeholder="0x123..., 0x456..., ..." 
+                />
               </div>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleAddParticipants} disabled={!selectedPool}>Agregar Participantes</Button>
+            <Button onClick={handleAddParticipant} disabled={!selectedPool}>Agregar Participantes</Button>
             </CardFooter>
           </Card>
         </TabsContent>
