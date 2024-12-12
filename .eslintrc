@@ -1,0 +1,68 @@
+{
+  "root": true,
+  "env": { "browser": true, "es2020": true },
+
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:react/jsx-runtime",
+    "plugin:import/recommended",
+    "plugin:jsx-a11y/recommended",
+    "prettier"
+  ],
+
+  "settings": {
+    "ecmaVersion": "latest",
+    "react": {
+      "version": "detect"
+    },
+    "import/resolver": {
+      "typescript": {
+        "project": ["./tsconfig.json", "./tsconfig.app.json", "./tsconfig.node.json"]
+      }
+    }
+  },
+
+  "plugins": ["react", "react-hooks", "import", "jsx-a11y", "react-refresh"],
+
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": { "project": ["./tsconfig.json", "./tsconfig.app.json", "./tsconfig.node.json"] },
+
+      "extends": [
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:import/typescript"
+      ],
+
+      "plugins": ["@typescript-eslint/eslint-plugin"],
+
+      "rules": {
+        // General rules
+        "react/prop-types": "off", // Desactiva prop-types
+        "no-shadow": "error",
+        "no-shadow-restricted-names": "error",
+
+        // TypeScript-specific rules
+        "@typescript-eslint/no-unused-vars": "warn",
+        "@typescript-eslint/no-misused-promises": ["error", { "checksVoidReturn": { "attributes": false } }],
+        "@typescript-eslint/no-unsafe-assignment": "off",
+
+        // Import sorting
+        "import/order": [
+          "warn",
+          {
+            "groups": ["external", "builtin", "internal", "parent", "sibling", "index"],
+            "newlines-between": "always",
+            "alphabetize": { "order": "asc" }
+          }
+        ]
+      }
+    }
+  ]
+}
