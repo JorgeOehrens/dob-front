@@ -10,8 +10,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useApi, useAccount } from '@gear-js/react-hooks';
-import { readState } from '@/hooks/api'
-import { useProgramMetadata } from '@/hooks/api'
+import { readState } from '@/app/hooks/api'
+import { useProgramMetadata , useWasmMetadata} from '@/app/hooks/api';
+import {userDataAdress} from '@/app/hooks/api';
+
 export function  Home() {
   const { isApiReady } = useApi();
   const { isAccountReady, account } = useAccount();
@@ -27,7 +29,11 @@ export function  Home() {
   const [distribution, setDistribution] = useState('')
   const [newParticipant, setNewParticipant] = useState('')
   console.log('../wasm/pool/pool.wasm')
-  useProgramMetadata('./pool.meta.hex')
+  const adreess_user = account?.address || "";
+  const metaData = userDataAdress(adreess_user)
+  const StadeRead = readState(metaData )
+
+  console.log(StadeRead)
 
   const pools = [
     { id: '1', name: 'Pool 1', type: 'Airdrop', creator: '0x1234...5678', participants: 100, transactions: 50 },

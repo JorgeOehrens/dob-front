@@ -10,12 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chakra-ui/react": "^3.2.3",
     "@gear-js/api": "0.39.0",
     "@gear-js/react-hooks": "0.14.1",
     "@gear-js/ui": "^0.5.28",
     "@gear-js/vara-ui": "0.0.10",
     "@gear-js/wallet-connect": "0.2.1",
     "@polkadot/api": "14.3.1",
+    "@polkadot/extension-dapp": "^0.57.1",
     "@polkadot/react-identicon": "3.11.3",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-radio-group": "^1.2.1",

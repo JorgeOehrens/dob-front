@@ -1,7 +1,7 @@
 import { useApi, useAccount } from '@gear-js/react-hooks';
 
 import { Header, Footer, ApiLoader } from '@/components';
-import { withProviders } from '@/hocs';
+import { withProviders } from '@/app/hocs';
 import { Routing } from '@/pages';
 import './App.scss';
 

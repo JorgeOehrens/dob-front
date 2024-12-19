@@ -1,5 +1,9 @@
 const ADDRESS = {
-  NODE: import.meta.env.VITE_NODE_ADDRESS as string,
+  NODE: process.env.REACT_APP_NODE_ADDRESS as string,
 };
 
-export { ADDRESS };
+const LOCAL_STORAGE = {
+  ACCOUNT: 'account',
+};
+
+export { ADDRESS, LOCAL_STORAGE };
