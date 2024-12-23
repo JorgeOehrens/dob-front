@@ -1,14 +1,25 @@
-import '@gear-js/vara-ui/dist/style.css';
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { App } from "./app";
+import dotenv from "dotenv";
+import { ChakraProvider } from "@chakra-ui/react";
+import { extendTheme } from "@chakra-ui/react";
 
-import { App } from './App';
+// Cargar variables de entorno desde el archivo .env
+dotenv.config();
 
-const container = document.getElementById('root');
-const root = createRoot(container as HTMLElement);
+const colors = {
+  brand: {
+    900: "#1a365d",
+    800: "#153e75",
+    700: "#2a69ac",
+  },
+};
 
-root.render(
-  <StrictMode>
+const theme = extendTheme({ colors });
+
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+  <ChakraProvider theme={theme}>
     <App />
-  </StrictMode>,
+  </ChakraProvider>
 );

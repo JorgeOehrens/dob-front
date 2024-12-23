@@ -1,13 +1,26 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from "react-router-dom";
+import { Home } from "./home";
+import { Landing } from "./Landing";
+import { NotFound } from "./not-found";
+import { Pool } from "./dob";
+const routes = [
+  { path: '/', Page: Landing },
+  { path: '/home', Page: Home },
+  { path: '/dob', Page: Pool },
 
-import { Home } from './home';
-
-const routes = [{ path: '/', Page: Home }];
+  { path: '/*', Page: NotFound }
+];
 
 function Routing() {
-  const getRoutes = () => routes.map(({ path, Page }) => <Route key={path} path={path} element={<Page />} />);
+  const location = useLocation();
 
-  return <Routes>{getRoutes()}</Routes>;
+  return (
+    <Routes location={location} key={location.pathname}>
+      {routes.map(({ path, Page }) => (
+        <Route key={path} path={path} element={<Page />} />
+      ))}
+    </Routes>
+  );
 }
 
 export { Routing };

@@ -1,4 +1,9 @@
-import { Header, Footer } from './layout';
-import { ApiLoader, Loader } from './loaders';
+export { Header } from './layout';
+export { ApiLoader, Loader } from './loaders';
 
-export { Header, Footer, ApiLoader, Loader };
+export { 
+    GreenColor,
+    YellowColor,
+    RedColor,
+    TrafficLightReadState
+} from './TrafficLightComponents';

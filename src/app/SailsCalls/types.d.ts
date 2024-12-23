@@ -46,7 +46,7 @@ export interface SailsQueryOptions {
      * ### Arguments, if any, for query method
      * Specify in the array all arguments for service method
      */
-    callArguments?: unknown[], // Change any[] to unknown[]
+    callArguments?: any[],
     /**
      * ### Callbacks for each state of the command
      */
@@ -61,7 +61,7 @@ export interface SailsCommandOptions {
      * ### Arguments, if any, for command method
      * Specify in the array all arguments for service method
      */
-    callArguments?: unknown[], // Change any[] to unknown[]
+    callArguments?: any[],
     /**
      * ### Callbacks for each state of the command
      * Callback available:

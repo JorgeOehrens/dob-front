@@ -1,18 +1,19 @@
-import { useApi, useAccount } from '@gear-js/react-hooks';
-
-import { Header, Footer, ApiLoader } from '@/components';
-import { withProviders } from '@/app/hocs';
-import { Routing } from '@/pages';
-import './App.scss';
-import { CONTRACT_DATA, sponsorName, sponsorMnemonic } from "./app/consts";
-
+import { useAccount, useApi } from "@gear-js/react-hooks";
+import { ApiLoader } from "@/components";
+import { Header } from "@/components/layout";
+import { withProviders } from "@/app/hocs";
+import { Routing } from "./pages";
 import { useInitSails } from "./app/hooks";
+import { CONTRACT_DATA, sponsorName, sponsorMnemonic } from "./app/consts";
+import "@gear-js/vara-ui/dist/style.css";
+import './App.scss';
 
 function Component() {
   const { isApiReady } = useApi();
-  const { isAccountReady } = useAccount();
+  const { isAccountReady, account } = useAccount();
+  const isAppReady = isApiReady && isAccountReady ;
 
-  const isAppReady = isApiReady && isAccountReady;
+  // Put your contract id and idl
   useInitSails({
     network: 'wss://testnet.vara.network',
     contractId: CONTRACT_DATA.programId,
@@ -25,11 +26,12 @@ function Component() {
       sponsorMnemonic
     }
   });
+
+  // App with context
   return (
     <>
-      <Header />
-      <main>{isAppReady ? <Routing /> : <ApiLoader />}</main>
-      <Footer />
+      <Header isAccountVisible={isAccountReady} />
+      {isAppReady ? <Routing /> : <ApiLoader />}
     </>
   );
 }

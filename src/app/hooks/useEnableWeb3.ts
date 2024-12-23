@@ -12,14 +12,11 @@ export const useEnableWeb3 = () => {
     useEffect(() => {
       if (!wallets) return;
       if (isEnable) return;
+  
       const syncWeb3 = async () => {
-        try {
-          await web3Enable(appName);
-          setWeb3IsEnable(true);
-          setIsEnable(true);
-        } catch (error) {
-          console.error('Failed to enable web3:', error);
-        }
+        await web3Enable(appName);
+        setWeb3IsEnable(true);
+        setIsEnable(true);
       }
   
       syncWeb3();

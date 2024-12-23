@@ -1,6 +1,3 @@
-import { useProgramMetadata } from './api';
-
-export { useProgramMetadata };
 export {
     useInitSails,
     useSailsCalls

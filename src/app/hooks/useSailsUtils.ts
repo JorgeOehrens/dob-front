@@ -1,7 +1,7 @@
 import { useEffect, useContext } from "react";
 import { sailsContext } from "@/Context";
 import { HexString } from "@gear-js/api";
-import { SponsorData } from "@/app/SailsCalls/types";
+import { SponsorData } from "../SailsCalls/types";
 import SailsCalls from "../SailsCalls"
 
 export interface InitSailsI {
