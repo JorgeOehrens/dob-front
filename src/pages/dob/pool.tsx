@@ -1,15 +1,3 @@
-import { 
-    Center, 
-    HStack, 
-    VStack, 
-} from "@chakra-ui/react";
-import { 
-    GreenColor,
-    RedColor,
-    YellowColor,
-    TrafficLightReadState
-} from "@/components";
-
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-
+import { TrafficLightReadState } from '@/components/TrafficLightComponents'
+import { PoolState } from '@/components/PoolComponents'
 export const Pool = () => {
 
   const [poolName, setPoolName] = useState('')
@@ -72,6 +61,9 @@ export const Pool = () => {
   }
 
     return (
+      <>
+      <PoolState/>
+      <TrafficLightReadState/>
         <div className="container mx-auto p-4">
 
         <h1 className="text-3xl font-bold mb-6">Dob Protocol UI</h1>
@@ -307,6 +299,6 @@ export const Pool = () => {
           </TabsContent>
         </Tabs>
       </div>
-      
+      </>
       );
 };

@@ -6,8 +6,8 @@ function Landing() {
   return (
     <Center>
       <VStack>
-        <Button textColor="black" bg="#00ffc4" as={Link} to="/home">
-          Traffic Light example
+        <Button textColor="black" bg="#00ffc4" as={Link} to="/dob">
+          Dob protocol example
         </Button>
       </VStack>  
     </Center>
