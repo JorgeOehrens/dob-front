@@ -21,7 +21,7 @@ function ReadState() {
         return;
       }
   
-      const response = await sails.query('Pool/GetState');
+      const response = await sails.query('Pool/DistributionPoolBalance');
   
       setFullState(response);
     }, 500);

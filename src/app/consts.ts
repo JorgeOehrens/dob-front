@@ -71,6 +71,7 @@ export const CONTRACT_DATA_POOL: ContractSails = {
   transaction_count: u256,
 };
 
+
 type Transaction = struct {
   destination: actor_id,
   payload: vec u8,
