@@ -6,7 +6,7 @@ import { DistributionPoolBalance } from "@/components/PoolComponents/Distributio
 import ViewPools from "@/components/PoolComponents/Pool/Details";
 
 export const Pool = () => {
-  const [activeTab, setActiveTab] = useState("create-pool"); // Estado para la pestaña activa
+  const [activeTab, setActiveTab] = useState("create-pool"); 
   const [poolName, setPoolName] = useState("");
   const [poolType, setPoolType] = useState("airdrop");
   const [initialAmount, setInitialAmount] = useState("");
@@ -30,11 +30,11 @@ export const Pool = () => {
 
   const handleAddParticipant = () => {
     if (newParticipant.trim() === "") return;
-    setParticipants([...participants, newParticipant.trim()]);
+    setParticipants([...participants, newParticipant]);
     setNewParticipant("");
   };
 
-  const handleRemoveParticipant = (index) => {
+  const handleRemoveParticipant = (index: number) => {
     setParticipants(participants.filter((_, i) => i !== index));
   };
 

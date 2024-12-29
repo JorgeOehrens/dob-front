@@ -56,7 +56,7 @@ export const CONTRACT_DATA: ContractSails = {
 
 
 export const CONTRACT_DATA_POOL: ContractSails = {
-  programId: '0xebba15f3c00317dbddc904092a234ca9055b145f84383546eff16183ac5d19ab',
+  programId: '0xe9ab0477153cd3b0fb57c4a35a08f71b615d585bfdf3016e78ff00833f2b3bd5',
   idl: `
     type State = struct {
   name: str,

@@ -8,11 +8,14 @@ interface Props {
 
 export function Header({ isAccountVisible }: Props) {
   return (
+    <div className="container mx-auto p-4">
+
     <header className={styles.header}>
       <Logo />
       {isAccountVisible && <Wallet theme='vara'/>}
       
     </header>
+    </div>
   );
 
   
