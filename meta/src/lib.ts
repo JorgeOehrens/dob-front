@@ -1,6 +1,10 @@
 import { GearApi, decodeAddress } from '@gear-js/api';
 import { TypeRegistry } from '@polkadot/types';
 import { TransactionBuilder, ActorId, getServiceNamePrefix, getFnNamePrefix, ZERO_ADDRESS } from 'sails-js';
+interface State {
+  // Aquí define las propiedades esperadas de `State`, si las conoces.
+  [key: string]: any; // Usa esto como temporal si no sabes los detalles exactos.
+}
 
 export class Program {
   public readonly registry: TypeRegistry;

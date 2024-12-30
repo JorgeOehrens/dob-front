@@ -4,8 +4,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useAlert, useAccount } from "@gear-js/react-hooks";
 import { Card } from "@chakra-ui/react";
 import { useSailsCalls } from "@/app/hooks";
-
-const ViewPool = () => {
+interface ViewPoolsProps {
+  pools: {
+    id: string;
+    name: string;
+    type: string;
+    creator: string;
+    participants: number;
+    transactions: number;
+  }[];
+}
+const ViewPools: React.FC<ViewPoolsProps> = ({ pools }) => {
   const { account } = useAccount();
   const sails = useSailsCalls();
   const alert = useAlert();
@@ -93,4 +102,4 @@ const ViewPool = () => {
   );
 };
 
-export default ViewPool;
+export default ViewPools;
