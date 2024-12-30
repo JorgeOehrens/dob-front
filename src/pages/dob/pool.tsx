@@ -7,26 +7,10 @@ import ViewPools from "@/components/PoolComponents/Pool/Details";
 import { CONTRACT_DATA } from "@/app/consts";
 import SailsCalls from "@/app/SailsCalls";
 
-const fetchWasmCode = async () => {
-  try {
-    const response = await fetch('../../../../wasm/wasm.opt.wasm');
-    if (!response.ok) {
-      throw new Error('Error al cargar el archivo WASM');
-    }
-    const code = await response.arrayBuffer(); // Obtén el código como ArrayBuffer
-    return new Uint8Array(code); // Convierte a Uint8Array si es necesario
-  } catch (error) {
-    console.error('Error al cargar el WASM:', error);
-    return null;
-  }
-};
+
 export const Pool = () => {
   const [activeTab, setActiveTab] = useState("create-pool"); 
   const [poolName, setPoolName] = useState("");
-  const [poolType, setPoolType] = useState("airdrop");
-  const [initialAmount, setInitialAmount] = useState("");
-  const [access, setAccess] = useState("public");
-  const [distributionMode, setDistributionMode] = useState("manual");
   const [selectedPool, setSelectedPool] = useState("");
   const [participants, setParticipants] = useState([]);
   const [distributionAddress, setDistributionAddress] = useState("");
@@ -94,9 +78,7 @@ export const Pool = () => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="create-pool">
-          <CreatePoolForm
-          
-          />
+         <CreatePoolForm/>
         </TabsContent>
         <TabsContent value="add-participants">
           <AddParticipantsForm

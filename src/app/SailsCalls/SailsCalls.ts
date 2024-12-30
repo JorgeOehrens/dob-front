@@ -49,10 +49,7 @@ export class SailsCalls {
             }
         } 
     }
-    public getGearApi(): GearApi {
-        return this.gearApi;
-    }
-    
+
     /**
      * ## Returs a new SailsCalls instance
      * Static method that returns a new instance of SailsCalls
@@ -631,7 +628,7 @@ export class SailsCalls {
 
             if ("signer" in signerData) {
                 const { userAddress, signer } = signerData as WalletSigner;
-                transaction.withAccount(userAddress, { signer: (signer as string | CodecClass<string>) as Signer });
+                transaction.withAccount(userAddress, { signer: (signer as string | CodecClass<Codec, any[]>) as Signer });
             } else {
                 const keyringPair = signerData as IKeyringPair;
                 transaction.withAccount(keyringPair);
