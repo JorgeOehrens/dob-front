@@ -5,8 +5,6 @@ import { AddParticipantsForm } from "@/components/PoolComponents/Participants/Pa
 import { DistributionPoolBalance } from "@/components/PoolComponents/Distribution/DistributionPoolBalance";
 import ViewPools from "@/components/PoolComponents/Pool/Details";
 import { CONTRACT_DATA } from "@/app/consts";
-import {Program} from '../../../meta/src/lib';
-import { web3Enable, web3Accounts, web3FromSource } from '@polkadot/extension-dapp';
 import SailsCalls from "@/app/SailsCalls";
 
 const fetchWasmCode = async () => {

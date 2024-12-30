@@ -1,6 +1,6 @@
 
 import { useAccount, useApi, useAlert } from "@gear-js/react-hooks";
-import { web3FromSource } from "@polkadot/extension-dapp";
+import { web3FromSource } from "@/extension-dapp";
 import { Button } from "@chakra-ui/react";
 import { useSailsCalls } from "@/app/hooks";
 
