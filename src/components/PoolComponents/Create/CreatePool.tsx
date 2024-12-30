@@ -1,98 +1,209 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import SailsCalls from "@/app/SailsCalls";
+import { useState, useEffect } from "react";
+import { web3Enable, web3Accounts, web3FromSource } from "@polkadot/extension-dapp";
+import { Program } from "../../../../meta/src/lib";
+import { CONTRACT_DATA } from "@/app/consts";
 
+const fetchWasmCode = async () => {
+  try {
+    const response = await fetch("../../../../wasm/wasm.opt.wasm");
+    if (!response.ok) {
+      throw new Error("Error al cargar el archivo WASM");
+    }
+    const code = await response.arrayBuffer();
+    return new Uint8Array(code);
+  } catch (error) {
+    console.error("Error al cargar el WASM:", error);
+    return null;
+  }
+};
 
-export const CreatePoolForm = ({ poolName, setPoolName, poolType, setPoolType, initialAmount, setInitialAmount, access, setAccess, distributionMode, setDistributionMode, participants, setParticipants, handleCreatePool, handleAddParticipant, handleRemoveParticipant, newParticipant, setNewParticipant }) => (
-  <Card>
-    <CardHeader>
-      <CardTitle>Crear Pool</CardTitle>
-      <CardDescription>Crea una nueva pool para el protocolo Dob.</CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="pool-name">Nombre de la Pool</Label>
-        <Input id="pool-name" value={poolName} onChange={(e) => setPoolName(e.target.value)} />
-      </div>
-      <div className="space-y-2">
-        <Label>Tipo de Pool</Label>
-        <RadioGroup value={poolType} onValueChange={setPoolType}>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="airdrop" id="airdrop" />
-            <Label htmlFor="airdrop">Airdrop</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="rewards" id="rewards" />
-            <Label htmlFor="rewards">Rewards</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="participation" id="participation" />
-            <Label htmlFor="participation">Participación</Label>
-          </div>
-        </RadioGroup>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="initial-amount">Monto Inicial</Label>
-        <Input
-          id="initial-amount"
-          type="number"
-          value={initialAmount}
-          onChange={(e) => setInitialAmount(e.target.value)}
-          placeholder="Ingrese el monto inicial"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="access">Acceso</Label>
-        <Select value={access} onValueChange={setAccess}>
-          <SelectTrigger id="access">
-            <SelectValue placeholder="Seleccione el tipo de acceso" />
-          </SelectTrigger>
-          <SelectContent className="select-content">
-            <SelectItem value="public">Público</SelectItem>
-            <SelectItem value="private">Privado</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="distribution-mode">Modo de Distribución</Label>
-        <Select value={distributionMode} onValueChange={setDistributionMode}>
-          <SelectTrigger id="distribution-mode">
-            <SelectValue placeholder="Seleccione el modo de distribución" />
-          </SelectTrigger>
-          <SelectContent className="select-content">
-            <SelectItem value="manual">Manual</SelectItem>
-            <SelectItem value="automatic">Automático</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="space-y-2">
-        <Label>Participantes</Label>
-        <div className="flex space-x-2">
-          <Input
-            value={newParticipant}
-            onChange={(e) => setNewParticipant(e.target.value)}
-            placeholder="Agregar dirección"
-          />
-          <Button onClick={handleAddParticipant}>Agregar</Button>
+export function CreatePoolForm() {
+  const [sailsCalls, setSailsCalls] = useState(null);
+  const [poolName, setPoolName] = useState("");
+  const [poolType, setPoolType] = useState("");
+  const [initialAmount, setInitialAmount] = useState("");
+  const [access, setAccess] = useState("");
+  const [distributionMode, setDistributionMode] = useState("");
+  const [participants, setParticipants] = useState([]);
+  const [newParticipant, setNewParticipant] = useState("");
+
+  // Inicializar SailsCalls al montar el componente
+  useEffect(() => {
+    const initSailsCalls = async () => {
+      const instance = await SailsCalls.new({
+        network: "wss://testnet.vara.network",
+        idl: CONTRACT_DATA.idl,
+      });
+      setSailsCalls(instance);
+      console.log("SailsCalls inicializado:", instance);
+    };
+
+    initSailsCalls().catch((err) => console.error("Error al inicializar SailsCalls:", err));
+  }, []);
+
+  const handleAddParticipant = () => {
+    if (newParticipant) {
+      setParticipants((prev) => [...prev, newParticipant]);
+      setNewParticipant("");
+    }
+  };
+
+  const handleRemoveParticipant = (index) => {
+    setParticipants((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleCreatePool = async () => {
+    try {
+      // Habilitar Polkadot.js
+      const extensions = await web3Enable("TuAplicacion");
+      if (!extensions.length) {
+        console.error("Polkadot.js extension no está habilitada.");
+        return;
+      }
+
+      // Obtener cuentas disponibles
+      const allAccounts = await web3Accounts();
+      if (!allAccounts.length) {
+        console.error("No se encontraron cuentas en la wallet.");
+        return;
+      }
+
+      // Seleccionar la primera cuenta
+      const account = allAccounts[0];
+      const injector = await web3FromSource(account.meta.source);
+
+      // Configurar el API de Gear
+      const gearApi = sailsCalls.getGearApi();
+      gearApi.setSigner(injector.signer);
+
+      // Cargar el código WASM
+      const code = await fetchWasmCode();
+      if (!code) {
+        console.error("No se pudo cargar el archivo WASM");
+        return;
+      }
+
+      // Configurar y calcular gas para el programa
+      const program = new Program(gearApi);
+      const ctorBuilder = await program
+        .newCtorFromCode(
+          code,
+          poolName,
+          poolType,
+          distributionMode,
+          access,
+          participants,
+          participants,
+          Number(initialAmount)
+        )
+        .withAccount(account.address)
+        .calculateGas();
+
+      // Firmar y enviar la transacción
+      const { blockHash, msgId, txHash } = await ctorBuilder.signAndSend();
+
+      console.log(
+        `\nProgram deployed.\n\tprogram id ${program.programId},\n\tblock hash: ${blockHash},\n\ttx hash: ${txHash},\n\tinit message id: ${msgId}`
+      );
+    } catch (error) {
+      console.error("Error al interactuar con GearApi:", error);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Crear Pool</CardTitle>
+        <CardDescription>Crea una nueva pool para el protocolo Dob.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="pool-name">Nombre de la Pool</Label>
+          <Input id="pool-name" value={poolName} onChange={(e) => setPoolName(e.target.value)} />
         </div>
-        <ul className="list-disc pl-6">
-          {participants.map((participant, index) => (
-            <li key={index} className="flex items-center space-x-2">
-              <span>{participant}</span>
-              <Button variant="ghost" size="sm" onClick={() => handleRemoveParticipant(index)}>
-                Eliminar
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </CardContent>
-    <CardFooter>
-      <Button onClick={handleCreatePool}>Crear Pool</Button>
-    </CardFooter>
-  </Card>
-);
+        <div className="space-y-2">
+          <Label>Tipo de Pool</Label>
+          <RadioGroup value={poolType} onValueChange={setPoolType}>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="airdrop" id="airdrop" />
+              <Label htmlFor="airdrop">Airdrop</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="rewards" id="rewards" />
+              <Label htmlFor="rewards">Rewards</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="participation" id="participation" />
+              <Label htmlFor="participation">Participación</Label>
+            </div>
+          </RadioGroup>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="initial-amount">Monto Inicial</Label>
+          <Input
+            id="initial-amount"
+            type="number"
+            value={initialAmount}
+            onChange={(e) => setInitialAmount(e.target.value)}
+            placeholder="Ingrese el monto inicial"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="access">Acceso</Label>
+          <Select value={access} onValueChange={setAccess}>
+            <SelectTrigger id="access">
+              <SelectValue placeholder="Seleccione el tipo de acceso" />
+            </SelectTrigger>
+            <SelectContent className="select-content">
+              <SelectItem value="public">Público</SelectItem>
+              <SelectItem value="private">Privado</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="distribution-mode">Modo de Distribución</Label>
+          <Select value={distributionMode} onValueChange={setDistributionMode}>
+            <SelectTrigger id="distribution-mode">
+              <SelectValue placeholder="Seleccione el modo de distribución" />
+            </SelectTrigger>
+            <SelectContent className="select-content">
+              <SelectItem value="manual">Manual</SelectItem>
+              <SelectItem value="automatic">Automático</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Participantes</Label>
+          <div className="flex space-x-2">
+            <Input
+              value={newParticipant}
+              onChange={(e) => setNewParticipant(e.target.value)}
+              placeholder="Agregar dirección"
+            />
+            <Button onClick={handleAddParticipant}>Agregar</Button>
+          </div>
+          <ul className="list-disc pl-6">
+            {participants.map((participant, index) => (
+              <li key={index} className="flex items-center space-x-2">
+                <span>{participant}</span>
+                <Button variant="ghost" size="sm" onClick={() => handleRemoveParticipant(index)}>
+                  Eliminar
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button onClick={handleCreatePool}>Crear Pool</Button>
+      </CardFooter>
+    </Card>
+  );
+}

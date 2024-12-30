@@ -1,10 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreatePoolForm } from "@/components/PoolComponents/Create/CreatePool";
 import { AddParticipantsForm } from "@/components/PoolComponents/Participants/Participants";
 import { DistributionPoolBalance } from "@/components/PoolComponents/Distribution/DistributionPoolBalance";
 import ViewPools from "@/components/PoolComponents/Pool/Details";
+import { CONTRACT_DATA } from "@/app/consts";
+import {Program} from '../../../meta/src/lib';
+import { web3Enable, web3Accounts, web3FromSource } from '@polkadot/extension-dapp';
+import SailsCalls from "@/app/SailsCalls";
 
+const fetchWasmCode = async () => {
+  try {
+    const response = await fetch('../../../../wasm/wasm.opt.wasm');
+    if (!response.ok) {
+      throw new Error('Error al cargar el archivo WASM');
+    }
+    const code = await response.arrayBuffer(); // Obtén el código como ArrayBuffer
+    return new Uint8Array(code); // Convierte a Uint8Array si es necesario
+  } catch (error) {
+    console.error('Error al cargar el WASM:', error);
+    return null;
+  }
+};
 export const Pool = () => {
   const [activeTab, setActiveTab] = useState("create-pool"); 
   const [poolName, setPoolName] = useState("");
@@ -18,22 +35,34 @@ export const Pool = () => {
   const [distributionType, setDistributionType] = useState("");
   const [distribution, setDistribution] = useState("");
   const [newParticipant, setNewParticipant] = useState("");
+  const [sailsCalls, setSailsCalls] = useState(null);
 
   const pools = [
     { id: "1", name: "Pool 1", type: "Airdrop", creator: "0x1234...5678", participants: 100, transactions: 50 },
     { id: "2", name: "Pool 2", type: "Rewards", creator: "0x8765...4321", participants: 75, transactions: 30 },
   ];
+  useEffect(() => {
+    const initSailsCalls = async () => {
+      const instance = await SailsCalls.new({
+        network: "wss://testnet.vara.network", // Cambia esto según tu configuración
+        idl: CONTRACT_DATA.idl, // Suponiendo que tienes un IDL válido
+      });
+      setSailsCalls(instance);
+      console.log("SailsCalls inicializado:", instance);
+    };
 
-  const handleCreatePool = () => {
-    console.log("Creating pool:", { poolName, poolType, initialAmount, access, distributionMode, participants });
-  };
+    initSailsCalls().catch((err) => console.error("Error al inicializar SailsCalls:", err));
+  }, []);
 
   const handleAddParticipant = () => {
     if (newParticipant.trim() === "") return;
     setParticipants([...participants, newParticipant]);
     setNewParticipant("");
   };
+  const handleCreatePool = ()=>{
+    console.log(poolName)
 
+  };
   const handleRemoveParticipant = (index: number) => {
     setParticipants(participants.filter((_, i) => i !== index));
   };
@@ -68,23 +97,7 @@ export const Pool = () => {
         </TabsList>
         <TabsContent value="create-pool">
           <CreatePoolForm
-            poolName={poolName}
-            setPoolName={setPoolName}
-            poolType={poolType}
-            setPoolType={setPoolType}
-            initialAmount={initialAmount}
-            setInitialAmount={setInitialAmount}
-            access={access}
-            setAccess={setAccess}
-            distributionMode={distributionMode}
-            setDistributionMode={setDistributionMode}
-            participants={participants}
-            setParticipants={setParticipants}
-            handleCreatePool={handleCreatePool}
-            handleAddParticipant={handleAddParticipant}
-            handleRemoveParticipant={handleRemoveParticipant}
-            newParticipant={newParticipant}
-            setNewParticipant={setNewParticipant}
+          
           />
         </TabsContent>
         <TabsContent value="add-participants">

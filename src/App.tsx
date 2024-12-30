@@ -26,6 +26,7 @@ function Component() {
       sponsorMnemonic
     }
   });
+  
 
   // App with context
   return (
