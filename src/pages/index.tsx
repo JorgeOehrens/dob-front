@@ -1,5 +1,4 @@
 import { Route, Routes, useLocation } from "react-router-dom";
-import { Home } from "./home";
 import { Landing } from "./Landing";
 import { NotFound } from "./not-found";
 import { Pool } from "./dob";
@@ -17,7 +16,6 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const routes = [
   { path: '/', Page: Landing },
-  { path: '/home', Page: Home },
   { path: '/dob', Page: Pool },
 
   { path: '/*', Page: NotFound }

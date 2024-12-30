@@ -631,7 +631,7 @@ export class SailsCalls {
 
             if ("signer" in signerData) {
                 const { userAddress, signer } = signerData as WalletSigner;
-                transaction.withAccount(userAddress, { signer: (signer as string | CodecClass<Codec, any[]>) as Signer });
+                transaction.withAccount(userAddress, { signer: (signer as string | CodecClass<string>) as Signer });
             } else {
                 const keyringPair = signerData as IKeyringPair;
                 transaction.withAccount(keyringPair);
