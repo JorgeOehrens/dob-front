@@ -17,6 +17,7 @@
     "jsx": "react-jsx",
     "paths": {
       "@/components/*": ["./src/components/*"],
+      "@polkadot/*": ["node_modules/@polkadot/*"],
 
       "@/*": ["./src/*"]
       //      "@/app/*": ["./src/app/*"],
