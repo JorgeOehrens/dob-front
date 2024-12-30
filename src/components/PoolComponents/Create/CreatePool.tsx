@@ -25,13 +25,13 @@ const fetchWasmCode = async () => {
 };
 
 export function CreatePoolForm() {
-  const [sailsCalls, setSailsCalls] = useState(null);
+  const [sailsCalls, setSailsCalls] = useState<SailsCalls | null>(null);
   const [poolName, setPoolName] = useState("");
   const [poolType, setPoolType] = useState("");
   const [initialAmount, setInitialAmount] = useState("");
   const [access, setAccess] = useState("");
   const [distributionMode, setDistributionMode] = useState("");
-  const [participants, setParticipants] = useState([]);
+  const [participants, setParticipants] = useState<string[]>([]);
   const [newParticipant, setNewParticipant] = useState("");
 
   // Inicializar SailsCalls al montar el componente
@@ -55,7 +55,7 @@ export function CreatePoolForm() {
     }
   };
 
-  const handleRemoveParticipant = (index) => {
+  const handleRemoveParticipant = (index: number) => {
     setParticipants((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -99,8 +99,8 @@ export function CreatePoolForm() {
           poolType,
           distributionMode,
           access,
-          participants,
-          participants,
+        ['0xb03bf2970534f469667832e8c5260533589ec2c0e0dbf739d6621dc008b9b342'],
+        ['0xb03bf2970534f469667832e8c5260533589ec2c0e0dbf739d6621dc008b9b342'],
           Number(initialAmount)
         )
         .withAccount(account.address)
