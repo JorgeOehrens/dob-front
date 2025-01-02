@@ -2,15 +2,18 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 import nodePolyfills from 'vite-plugin-node-stdlib-browser';
-import eslint from 'vite-plugin-eslint';
 import svgr from 'vite-plugin-svgr';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'src'),
+      '@': path.resolve(__dirname, './src'),
+      '@/components': path.resolve(__dirname, './src/components'),
+      '@/app': path.resolve(__dirname, './src/app'),
+      '@/assets': path.resolve(__dirname, './src/assets'),
     },
+    
   },
   server: {
     host: '0.0.0.0',
@@ -20,7 +23,7 @@ export default defineConfig({
     port: 3000,
     host: true,
   },
-  plugins: [svgr(), react(), nodePolyfills(), eslint()],
+  plugins: [svgr(), react(), nodePolyfills()],
   assetsInclude: ['**/*.wasm?inline', '**/*.txt?inline'],
   build: { outDir: 'build' },
 });
