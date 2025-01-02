@@ -84,8 +84,9 @@ export function CreatePoolForm() {
       const injector = await web3FromSource(account.meta.source);
 
       // Configurar el API de Gear
-      const gearApi = sailsCalls.getGearApi();
-      gearApi.setSigner(injector.signer);
+      if (sailsCalls) {
+        const gearApi = sailsCalls.getGearApi();
+        gearApi.setSigner(injector.signer);
 
       // Cargar el código WASM
       const code = await fetchWasmCode();
@@ -127,6 +128,10 @@ export function CreatePoolForm() {
         participantes: participants,
         transacciones: [{ txHash }], // Almacena las transacciones con el hash inicial
       });
+
+      } else {
+        console.error("sailsCalls is null");
+      }
     } catch (error) {
       console.error("Error al interactuar con GearApi:", error);
     }
