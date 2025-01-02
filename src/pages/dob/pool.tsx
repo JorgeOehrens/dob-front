@@ -6,9 +6,14 @@ import { DistributionPoolBalance } from "@/components/PoolComponents/Distributio
 import ViewPools from "@/components/PoolComponents/Pool/Details";
 import { CONTRACT_DATA } from "@/app/consts";
 import SailsCalls from "@/app/SailsCalls";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient("https://lwmvtiydijytxugorjrd.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3bXZ0aXlkaWp5dHh1Z29yanJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUyNDQ1ODcsImV4cCI6MjA1MDgyMDU4N30.hGCsLUY_N9RyJg0iebs5IgONMhKjv3lMgkuj_zcOZMY");
 
 
 export const Pool = () => {
+  const [pools2, setPool2] = useState<any[]>([]);
+
   const [activeTab, setActiveTab] = useState("create-pool"); 
   const [poolName, setPoolName] = useState("");
   const [selectedPool, setSelectedPool] = useState("");
@@ -17,17 +22,22 @@ export const Pool = () => {
   const [distributionType, setDistributionType] = useState("");
   const [distribution, setDistribution] = useState("");
   const [newParticipant, setNewParticipant] = useState("");
-  const [sailsCalls, setSailsCalls] = useState(null);
-
+  const [, setSailsCalls] = useState(null);
+  async function getPools() {
+    const { data } = await supabase.from("pools").select();
+    setPool2(data || []);
+  }
   const pools = [
     { id: "1", name: "Pool 1", type: "Airdrop", creator: "0x1234...5678", participants: 100, transactions: 50 },
     { id: "2", name: "Pool 2", type: "Rewards", creator: "0x8765...4321", participants: 75, transactions: 30 },
   ];
   useEffect(() => {
+    getPools(); 
+
     const initSailsCalls = async () => {
       const instance = await SailsCalls.new({
-        network: "wss://testnet.vara.network", // Cambia esto según tu configuración
-        idl: CONTRACT_DATA.idl, // Suponiendo que tienes un IDL válido
+        network: "wss://testnet.vara.network",
+        idl: CONTRACT_DATA.idl,
       });
       setSailsCalls(instance);
       console.log("SailsCalls inicializado:", instance);
@@ -41,13 +51,8 @@ export const Pool = () => {
     setParticipants([...participants, newParticipant]);
     setNewParticipant("");
   };
-  const handleCreatePool = ()=>{
-    console.log(poolName)
 
-  };
-  const handleRemoveParticipant = (index: number) => {
-    setParticipants(participants.filter((_, i) => i !== index));
-  };
+
 
   const handleCreateDistribution = () => {
     console.log("Creating distribution:", {
@@ -58,6 +63,7 @@ export const Pool = () => {
       participants_pool: participants,
     });
   };
+  console.log(pools2)
 
   return (
     <div className="container mx-auto p-4">
@@ -105,7 +111,7 @@ export const Pool = () => {
           />
         </TabsContent>
         <TabsContent value="view-pools">
-          <ViewPools pools={pools} />
+          <ViewPools  />
         </TabsContent>
       </Tabs>
     </div>

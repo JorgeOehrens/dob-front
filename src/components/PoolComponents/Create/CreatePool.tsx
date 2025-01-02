@@ -9,6 +9,9 @@ import { useState, useEffect } from "react";
 import { web3Enable, web3Accounts, web3FromSource } from "@polkadot/extension-dapp";
 import { Program } from "../../../../meta/src/lib";
 import { CONTRACT_DATA } from "@/app/consts";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient("https://lwmvtiydijytxugorjrd.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3bXZ0aXlkaWp5dHh1Z29yanJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUyNDQ1ODcsImV4cCI6MjA1MDgyMDU4N30.hGCsLUY_N9RyJg0iebs5IgONMhKjv3lMgkuj_zcOZMY");
 
 const fetchWasmCode = async () => {
   try {
@@ -31,7 +34,7 @@ export function CreatePoolForm() {
   const [initialAmount, setInitialAmount] = useState("");
   const [access, setAccess] = useState("");
   const [distributionMode, setDistributionMode] = useState("");
-  const [participants, setParticipants] = useState<string[]>([]);
+  const [participants, setParticipants] = useState<string[]>([]); // Use string[]
   const [newParticipant, setNewParticipant] = useState("");
 
   // Inicializar SailsCalls al montar el componente
@@ -49,11 +52,12 @@ export function CreatePoolForm() {
   }, []);
 
   const handleAddParticipant = () => {
-    if (newParticipant) {
-      setParticipants((prev) => [...prev, newParticipant]);
+    if (newParticipant.trim() !== "") {
+      setParticipants((prev) => [...prev, newParticipant.trim()]); // Add as a string
       setNewParticipant("");
     }
   };
+
 
   const handleRemoveParticipant = (index: number) => {
     setParticipants((prev) => prev.filter((_, i) => i !== index));
@@ -99,19 +103,30 @@ export function CreatePoolForm() {
           poolType,
           distributionMode,
           access,
-        ['0xb03bf2970534f469667832e8c5260533589ec2c0e0dbf739d6621dc008b9b342'],
-        ['0xb03bf2970534f469667832e8c5260533589ec2c0e0dbf739d6621dc008b9b342'],
-          Number(initialAmount)
+          ['0xb03bf2970534f469667832e8c5260533589ec2c0e0dbf739d6621dc008b9b342'],
+          ['0xb03bf2970534f469667832e8c5260533589ec2c0e0dbf739d6621dc008b9b342'],
+          1
         )
         .withAccount(account.address)
         .calculateGas();
-
-      // Firmar y enviar la transacción
+        ctorBuilder.withValue(BigInt(Number(initialAmount) * 1e12)); 
+        // Firmar y enviar la transacción
       const { blockHash, msgId, txHash } = await ctorBuilder.signAndSend();
 
       console.log(
         `\nProgram deployed.\n\tprogram id ${program.programId},\n\tblock hash: ${blockHash},\n\ttx hash: ${txHash},\n\tinit message id: ${msgId}`
       );
+      // Insertar datos en la tabla `pools` de Supabase
+      const { error } = await supabase.from("pools").insert({
+        nombre: poolName,
+        modo_distribucion: distributionMode,
+        id_vara:program.programId,
+        acceso: access,
+        tipo: poolType,
+        creador: account.address,
+        participantes: participants,
+        transacciones: [{ txHash }], // Almacena las transacciones con el hash inicial
+      });
     } catch (error) {
       console.error("Error al interactuar con GearApi:", error);
     }
