@@ -27,21 +27,37 @@ export class Program {
     if (!this._programId) throw new Error(`Program ID is not set`);
     return this._programId;
   }
-
-  newCtorFromCode(code: Uint8Array | Buffer, name: string, type_pool: string, distribution_mode: string, access_type: string, owners: Array<ActorId>, participants_pool: Array<ActorId>, required: number): TransactionBuilder<null> {
+  newCtorFromCode(
+    code: Uint8Array | Buffer,
+    name: string,
+    type_pool: string,
+    distribution_mode: string,
+    access_type: string,
+    owners: Array<ActorId>,
+    participants_pool: Array<ActorId>,
+    required: number
+  ): TransactionBuilder<null> {
+    // Convertir el código a Uint8Array si es un Buffer
+    const uint8ArrayCode = code instanceof Buffer ? new Uint8Array(code) : code;
+  
+    // Convertir owners y participants_pool a Uint8Array si es necesario
+    const ownersFormatted = owners.map((owner) => new Uint8Array(owner));
+    const participantsFormatted = participants_pool.map((participant) => new Uint8Array(participant));
+  
     const builder = new TransactionBuilder<null>(
       this.api,
       this.registry,
       'upload_program',
-      ['New', name, type_pool, distribution_mode, access_type, owners, participants_pool, required],
+      ['New', name, type_pool, distribution_mode, access_type, ownersFormatted, participantsFormatted, required],
       '(String, String, String, String, String, Vec<[u8;32]>, Vec<[u8;32]>, u32)',
       'String',
-      code,
+      uint8ArrayCode
     );
-
+  
     this._programId = builder.programId;
     return builder;
   }
+  
 
   newCtorFromCodeId(codeId: `0x${string}`, name: string, type_pool: string, distribution_mode: string, access_type: string, owners: Array<ActorId>, participants_pool: Array<ActorId>, required: number) {
     const builder = new TransactionBuilder<null>(
