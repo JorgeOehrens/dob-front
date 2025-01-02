@@ -17,11 +17,9 @@
     "jsx": "react-jsx",
     "paths": {
       "@/components/*": ["./src/components/*"],
-
-      "@/*": ["./src/*"]
-      //      "@/app/*": ["./src/app/*"],
-      //      "@/assets/*": ["./src/assets/*"],
-      //      "@/components/*": ["./src/components/*"]
+      "@/*": ["./src/*"],
+      "@/app/*": ["./src/app/*"],
+      "@/assets/*": ["./src/assets/*"],
     },
     "types": ["vite-plugin-svgr/client"]
   },
