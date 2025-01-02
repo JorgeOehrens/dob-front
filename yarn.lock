@@ -6288,13 +6288,13 @@ __metadata:
     "@gear-js/ui": "npm:~0.5.28"
     "@gear-js/vara-ui": "npm:0.0.11"
     "@gear-js/wallet-connect": "npm:0.1.2"
-    "@polkadot/api": "npm:^15.1.1"
+    "@polkadot/api": "npm:13.2.1"
     "@polkadot/extension-dapp": "npm:0.57.1"
     "@polkadot/extension-inject": "npm:0.46.5"
     "@polkadot/keyring": "npm:^13.2.3"
     "@polkadot/react-identicon": "npm:3.5.1"
     "@polkadot/types": "npm:13.2.1"
-    "@polkadot/util": "npm:^13.2.3"
+    "@polkadot/util": "npm:13.2.3"
     "@polkadot/util-crypto": "npm:^13.2.3"
     "@polkadot/wasm-crypto": "npm:7.3.2"
     "@polkadot/x-randomvalues": "npm:^13.2.3"
@@ -6335,7 +6335,7 @@ __metadata:
     rxjs: "npm:^7.8.1"
     sails-js: "npm:0.3.0"
     sails-js-parser: "npm:0.3.1"
-    sails-js-types: "npm:^0.3.1"
+    sails-js-types: "npm:0.0.1"
     sails-js-util: "npm:0.0.1"
     sass: "npm:1.69.1"
     simplebar-react: "npm:3.2.6"
@@ -9845,10 +9845,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sails-js-types@npm:^0.3.1":
-  version: 0.3.1
-  resolution: "sails-js-types@npm:0.3.1"
-  checksum: 10c0/2f390a4fc51594c87003e34f27350c098bd214a5fc9c49f5735f777ace82b9a41bb2c2b509f0240c034d39cc877c2e73c628f225f0152cfd5289ff88c993bbb2
+"sails-js-types@npm:0.0.1":
+  version: 0.0.1
+  resolution: "sails-js-types@npm:0.0.1"
+  checksum: 10c0/da9e00bfd23cea9adfd94dba50e8e34abfea28375480503c2c84e0c43187dc716200362980aca29ee881e5a679087575bfab1de0fd1e0130f02f216a764cd275
   languageName: node
   linkType: hard
 
