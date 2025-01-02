@@ -23,7 +23,7 @@
     "@polkadot/extension-inject": "0.46.5",
     "@polkadot/keyring": "^13.2.3",
     "@polkadot/react-identicon": "3.5.1",
-    "@polkadot/types": "13.2.1",
+    "@polkadot/types" : "15.1.1",
     "@polkadot/util": "^13.2.3",
     "@polkadot/util-crypto": "^13.2.3",
     "@polkadot/wasm-crypto": "7.3.2",
@@ -82,7 +82,7 @@
     "vite-plugin-wasm": "3.2.2"
   },
   "resolutions": {
-    "@polkadot/types": "13.2.1",
+    "@polkadot/types" : "15.1.1",
     "@polkadot/util": "^13.2.3",
     "@polkadot/api": "^15.1.1"
   },
