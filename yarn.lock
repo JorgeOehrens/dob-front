@@ -2436,7 +2436,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/api@npm:^15.1.1":
+"@polkadot/api@npm:15.1.1":
   version: 15.1.1
   resolution: "@polkadot/api@npm:15.1.1"
   dependencies:
@@ -2802,6 +2802,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@polkadot/types-create@npm:13.2.1":
+  version: 13.2.1
+  resolution: "@polkadot/types-create@npm:13.2.1"
+  dependencies:
+    "@polkadot/types-codec": "npm:13.2.1"
+    "@polkadot/util": "npm:^13.1.1"
+    tslib: "npm:^2.7.0"
+  checksum: 10c0/056bd5cf6978acabd7e9332e0ff45845329e3543952d1030dd4f9ae94d7e8a28e5e8c19ff54df58e5ea0c3557d0a05622ae2086b15f98b99e2ea96780a01714e
+  languageName: node
+  linkType: hard
+
 "@polkadot/types-create@npm:15.1.1":
   version: 15.1.1
   resolution: "@polkadot/types-create@npm:15.1.1"
@@ -2867,19 +2878,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/types@npm:15.1.1":
-  version: 15.1.1
-  resolution: "@polkadot/types@npm:15.1.1"
+"@polkadot/types@npm:13.2.1":
+  version: 13.2.1
+  resolution: "@polkadot/types@npm:13.2.1"
   dependencies:
-    "@polkadot/keyring": "npm:^13.2.3"
-    "@polkadot/types-augment": "npm:15.1.1"
-    "@polkadot/types-codec": "npm:15.1.1"
-    "@polkadot/types-create": "npm:15.1.1"
-    "@polkadot/util": "npm:^13.2.3"
-    "@polkadot/util-crypto": "npm:^13.2.3"
+    "@polkadot/keyring": "npm:^13.1.1"
+    "@polkadot/types-augment": "npm:13.2.1"
+    "@polkadot/types-codec": "npm:13.2.1"
+    "@polkadot/types-create": "npm:13.2.1"
+    "@polkadot/util": "npm:^13.1.1"
+    "@polkadot/util-crypto": "npm:^13.1.1"
     rxjs: "npm:^7.8.1"
-    tslib: "npm:^2.8.0"
-  checksum: 10c0/666f0e31722717d34d666a7d559c19af00bb23ba9932deaef2be0016961e2b14c49c80a6ec543cf3264faf502b32c239da2ded93aac3fb975e461d97118d5d8a
+    tslib: "npm:^2.7.0"
+  checksum: 10c0/fabc6d75acc4bf11b60d428046580684032fdb9c3e807225e406059da956bd3169155a14262a419c8d7eb796e6b5a71d7afa7ff8a0613fc86ff2d9b7f6840d6b
   languageName: node
   linkType: hard
 
@@ -2952,7 +2963,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkadot/util@npm:^13.2.3":
+"@polkadot/util@npm:13.2.3":
   version: 13.2.3
   resolution: "@polkadot/util@npm:13.2.3"
   dependencies:
@@ -10325,7 +10336,7 @@ __metadata:
     "@polkadot/extension-inject": "npm:0.46.5"
     "@polkadot/keyring": "npm:^13.2.3"
     "@polkadot/react-identicon": "npm:3.5.1"
-    "@polkadot/types": "npm:15.1.1"
+    "@polkadot/types": "npm:13.2.1"
     "@polkadot/util": "npm:^13.2.3"
     "@polkadot/util-crypto": "npm:^13.2.3"
     "@polkadot/wasm-crypto": "npm:7.3.2"
