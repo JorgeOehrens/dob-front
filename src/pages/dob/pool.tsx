@@ -69,8 +69,12 @@ export const Pool = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Dob Protocol UI</h1>
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value)}>
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="create-pool" className={activeTab === "create-pool" ? "bg-green-300 " : ""}>
+
+      <div className="overflow-x-auto">
+
+
+      <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 h-auto">
+      <TabsTrigger value="create-pool" className={activeTab === "create-pool" ? "bg-green-300 " : ""}>
             Create Pool
           </TabsTrigger>
           <TabsTrigger value="add-participants" className={activeTab === "add-participants" ? "bg-green-300 " : ""}>
@@ -86,7 +90,10 @@ export const Pool = () => {
             View Pools
           </TabsTrigger>
         </TabsList>
+
+        </div>
         <TabsContent value="create-pool">
+          
          <CreatePoolForm/>
         </TabsContent>
         <TabsContent value="add-participants">
