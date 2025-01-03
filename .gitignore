@@ -18,7 +18,6 @@ node_modules
 .pnp.*
 
 # production
-build
 dist
 
 # misc
