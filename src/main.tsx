@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import { App } from "@/app";
+import { App } from "./app";
 import dotenv from "dotenv";
 import { ChakraProvider } from "@chakra-ui/react";
 import { extendTheme } from "@chakra-ui/react";
