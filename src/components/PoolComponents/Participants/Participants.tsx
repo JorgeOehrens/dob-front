@@ -5,10 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-
-export const AddParticipantsForm = ({ pools, selectedPool, setSelectedPool, newParticipant, setNewParticipant, handleAddParticipant }) => (
-    <Card>
+interface AddParticipantsFormProps {
+  pools: any; // replace with specific type
+  selectedPool: any; // replace with specific type
+  setSelectedPool: (value: string) => void;
+  newParticipant: any; // replace with specific type
+  setNewParticipant: any; // replace with specific type
+  handleAddParticipant: any; // replace with specific type
+}
+interface Pool {
+  id: string; // or number, depending on your data
+  name: string;
+}
+export const AddParticipantsForm = ({ pools, selectedPool, setSelectedPool, newParticipant, setNewParticipant, handleAddParticipant }: AddParticipantsFormProps) => (
+  <Card>
       <CardHeader>
         <CardTitle>Agregar Participantes</CardTitle>
         <CardDescription>Agrega participantes a una pool existente.</CardDescription>
@@ -21,7 +31,7 @@ export const AddParticipantsForm = ({ pools, selectedPool, setSelectedPool, newP
               <SelectValue placeholder="Seleccione una pool" />
             </SelectTrigger>
             <SelectContent className="select-content">
-              {pools.map((pool) => (
+              {pools.map((pool:Pool) => (
                 <SelectItem key={pool.id} value={pool.id}>{pool.name}</SelectItem>
               ))}
             </SelectContent>

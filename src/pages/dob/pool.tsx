@@ -17,12 +17,12 @@ export const Pool = () => {
   const [activeTab, setActiveTab] = useState("create-pool"); 
   const [poolName, setPoolName] = useState("");
   const [selectedPool, setSelectedPool] = useState("");
-  const [participants, setParticipants] = useState([]);
+  const [participants, setParticipants] = useState<string[]>([]);
   const [distributionAddress, setDistributionAddress] = useState("");
   const [distributionType, setDistributionType] = useState("");
   const [distribution, setDistribution] = useState("");
   const [newParticipant, setNewParticipant] = useState("");
-  const [, setSailsCalls] = useState(null);
+  const [, setSailsCalls] = useState<SailsCalls | null>(null);
   async function getPools() {
     const { data } = await supabase.from("pools").select();
     setPool2(data || []);

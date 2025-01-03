@@ -8,7 +8,24 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-function DistributionPoolBalance({ pools, selectedPool, setSelectedPool, distributionAddress, setDistributionAddress, distributionType, setDistributionType, distribution, setDistribution, handleCreateDistribution }) {
+
+interface DistributionPoolBalanceProps {
+  pools: any;
+  selectedPool: any;
+  setSelectedPool: any;
+  distributionAddress: any;
+  setDistributionAddress: any;
+  distributionType: any;
+  setDistributionType: any;
+  distribution: any;
+  setDistribution: any;
+  handleCreateDistribution: any;
+}
+interface Pool {
+  id: string; // or number, depending on your data
+  name: string;
+}
+function DistributionPoolBalance({ pools, selectedPool, setSelectedPool, distributionAddress, setDistributionAddress, distributionType, setDistributionType, distribution, setDistribution, handleCreateDistribution }: DistributionPoolBalanceProps) {
   const sails = useSailsCalls();
   const alert = useAlert();
   const { account } = useAccount();
@@ -60,7 +77,7 @@ function DistributionPoolBalance({ pools, selectedPool, setSelectedPool, distrib
               <SelectValue placeholder="Seleccione una pool" />
             </SelectTrigger>
             <SelectContent className="select-content">
-              {pools.map((pool) => (
+            {pools.map((pool: Pool) => (
                 <SelectItem key={pool.id} value={pool.id}>{pool.name}</SelectItem>
               ))}
             </SelectContent>
