@@ -1,1 +1,1 @@
-export {Header} from '@/components/layout/header/header';
+export {Header} from './header';

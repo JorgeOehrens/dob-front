@@ -3,11 +3,11 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "allowJs": true,
+    "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
-    "strict": false,
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
     "moduleResolution": "Node",
@@ -17,6 +17,9 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"]
+      //      "@/app/*": ["./src/app/*"],
+      //      "@/assets/*": ["./src/assets/*"],
+      //      "@/components/*": ["./src/components/*"]
     },
     "types": ["vite-plugin-svgr/client"]
   },
