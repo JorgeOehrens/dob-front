@@ -98,45 +98,43 @@ const ViewPools: React.FC = () => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Detalles de las Pools</CardTitle>
-        <CardDescription>Todas las pools creadas por DobProtocol</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Modo distribución</TableHead>
-              <TableHead>Acceso</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Creador</TableHead>
-              <TableHead>Participantes</TableHead>
-              <TableHead>Transacciones</TableHead>
-              <TableHead>ID Vara</TableHead>
-
+    <CardHeader>
+      <CardTitle>Pool Details</CardTitle>
+      <CardDescription>All pools created by DobProtocol</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Distribution Mode</TableHead>
+            <TableHead>Access</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Creator</TableHead>
+            <TableHead>Participants</TableHead>
+            <TableHead>Transactions</TableHead>
+            <TableHead>ID Vara</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {pools.map((pool) => (
+            <TableRow key={pool.id}>
+              <TableCell>{pool.nombre}</TableCell>
+              <TableCell>Syncing with blockchain...</TableCell>
+              <TableCell>{pool.modo_distribucion}</TableCell>
+              <TableCell>{pool.acceso}</TableCell>
+              <TableCell>{pool.tipo}</TableCell>
+              <TableCell>{pool.creador}</TableCell>
+              <TableCell>-</TableCell>
+              <TableCell>-</TableCell>
+              <TableCell>{pool.id_vara}</TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {pools.map((pool) => (
-              <TableRow key={pool.id}>
-                <TableCell>{pool.nombre}</TableCell>
-                <TableCell>Sincronizando con blockchain...</TableCell>
-                <TableCell>{pool.modo_distribucion}</TableCell>
-                <TableCell>{pool.acceso}</TableCell>
-                <TableCell>{pool.tipo}</TableCell>
-                <TableCell>{pool.creador}</TableCell>
-                <TableCell>-</TableCell>
-                <TableCell>-</TableCell>
-                <TableCell>{pool.id_vara}</TableCell>
-
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+          ))}
+        </TableBody>
+      </Table>
+    </CardContent>
+  </Card>
   );
 };
 

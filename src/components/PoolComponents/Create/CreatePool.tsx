@@ -140,16 +140,16 @@ export function CreatePoolForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Crear Pool</CardTitle>
-        <CardDescription>Crea una nueva pool para el protocolo Dob.</CardDescription>
+        <CardTitle>Create Pool</CardTitle>
+        <CardDescription>Create a new pool for the Dob protocol.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="pool-name">Nombre de la Pool</Label>
+          <Label htmlFor="pool-name">Pool Name</Label>
           <Input id="pool-name" value={poolName} onChange={(e) => setPoolName(e.target.value)} />
         </div>
         <div className="space-y-2">
-          <Label>Tipo de Pool</Label>
+          <Label>Pool Type</Label>
           <RadioGroup value={poolType} onValueChange={setPoolType}>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="airdrop" id="airdrop" />
@@ -161,60 +161,60 @@ export function CreatePoolForm() {
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="participation" id="participation" />
-              <Label htmlFor="participation">Participación</Label>
+              <Label htmlFor="participation">Participation</Label>
             </div>
           </RadioGroup>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="initial-amount">Monto Inicial</Label>
+          <Label htmlFor="initial-amount">Initial Amount</Label>
           <Input
             id="initial-amount"
             type="number"
             value={initialAmount}
             onChange={(e) => setInitialAmount(e.target.value)}
-            placeholder="Ingrese el monto inicial"
+            placeholder="Enter the initial amount"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="access">Acceso</Label>
+          <Label htmlFor="access">Access</Label>
           <Select value={access} onValueChange={setAccess}>
             <SelectTrigger id="access">
-              <SelectValue placeholder="Seleccione el tipo de acceso" />
+              <SelectValue placeholder="Select the type of access" />
             </SelectTrigger>
             <SelectContent className="select-content">
-              <SelectItem value="public">Público</SelectItem>
-              <SelectItem value="private">Privado</SelectItem>
+              <SelectItem value="public">Public</SelectItem>
+              <SelectItem value="private">Private</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="distribution-mode">Modo de Distribución</Label>
+          <Label htmlFor="distribution-mode">Distribution Mode</Label>
           <Select value={distributionMode} onValueChange={setDistributionMode}>
             <SelectTrigger id="distribution-mode">
-              <SelectValue placeholder="Seleccione el modo de distribución" />
+              <SelectValue placeholder="Select the distribution mode" />
             </SelectTrigger>
             <SelectContent className="select-content">
               <SelectItem value="manual">Manual</SelectItem>
-              <SelectItem value="automatic">Automático</SelectItem>
+              <SelectItem value="automatic">Automatic</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-2">
-          <Label>Participantes</Label>
+          <Label>Participants</Label>
           <div className="flex space-x-2">
             <Input
               value={newParticipant}
               onChange={(e) => setNewParticipant(e.target.value)}
-              placeholder="Agregar dirección"
+              placeholder="Add address"
             />
-            <Button onClick={handleAddParticipant}>Agregar</Button>
+            <Button onClick={handleAddParticipant}>Add</Button>
           </div>
           <ul className="list-disc pl-6">
             {participants.map((participant, index) => (
               <li key={index} className="flex items-center space-x-2">
                 <span>{participant}</span>
                 <Button variant="ghost" size="sm" onClick={() => handleRemoveParticipant(index)}>
-                  Eliminar
+                  Remove
                 </Button>
               </li>
             ))}
@@ -222,7 +222,7 @@ export function CreatePoolForm() {
         </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleCreatePool}>Crear Pool</Button>
+        <Button onClick={handleCreatePool}>Create Pool</Button>
       </CardFooter>
     </Card>
   );

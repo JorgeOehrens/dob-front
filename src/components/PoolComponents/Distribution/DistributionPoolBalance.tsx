@@ -63,70 +63,69 @@ function DistributionPoolBalance({ pools, selectedPool, setSelectedPool, distrib
   };
 
   return (
-  
-      <Card>
-      <CardHeader>
-        <CardTitle>Crear Distribución</CardTitle>
-        <CardDescription>Crea una nueva distribución para una pool existente.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="distribution-pool">Seleccionar Pool</Label>
-          <Select value={selectedPool} onValueChange={setSelectedPool}>
-            <SelectTrigger id="distribution-pool">
-              <SelectValue placeholder="Seleccione una pool" />
-            </SelectTrigger>
-            <SelectContent className="select-content">
-            {pools.map((pool: Pool) => (
-                <SelectItem key={pool.id} value={pool.id}>{pool.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="distribution-address">Dirección del Contrato de Distribución</Label>
-          <Input
-            id="distribution-address"
-            value={distributionAddress}
-            onChange={(e) => setDistributionAddress(e.target.value)}
-            placeholder="0x..."
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="distribution-type">Tipo de Distribución</Label>
-          <Select value={distributionType} onValueChange={setDistributionType}>
-            <SelectTrigger id="distribution-type">
-              <SelectValue placeholder="Seleccione el tipo de distribución" />
-            </SelectTrigger>
-            <SelectContent className="select-content">
-              <SelectItem value="equal">Igual</SelectItem>
-              <SelectItem value="weighted">Ponderada</SelectItem>
-              <SelectItem value="custom">Personalizada</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="distribution-details">Detalles de la Distribución</Label>
-          <Input
-            id="distribution-details"
-            value={distribution}
-            onChange={(e) => setDistribution(e.target.value)}
-            placeholder="Formato: cantidad,dirección,..."
-          />
-        </div>
-      </CardContent>
-      <CardFooter>
-        <Button
-          onClick={handleCreateDistribution}
-          disabled={!selectedPool || !distributionAddress || !distributionType}
-        >
-          Crear Distribución
-        </Button>
-        <Button backgroundColor="green.300" onClick={signer}>
-      Send Distribution
-    </Button>
-      </CardFooter>
-    </Card>
+    <Card>
+    <CardHeader>
+      <CardTitle>Create Distribution</CardTitle>
+      <CardDescription>Create a new distribution for an existing pool.</CardDescription>
+    </CardHeader>
+    <CardContent className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="distribution-pool">Select Pool</Label>
+        <Select value={selectedPool} onValueChange={setSelectedPool}>
+          <SelectTrigger id="distribution-pool">
+            <SelectValue placeholder="Select a pool" />
+          </SelectTrigger>
+          <SelectContent className="select-content">
+          {pools.map((pool: Pool) => (
+              <SelectItem key={pool.id} value={pool.id}>{pool.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="distribution-address">Distribution Contract Address</Label>
+        <Input
+          id="distribution-address"
+          value={distributionAddress}
+          onChange={(e) => setDistributionAddress(e.target.value)}
+          placeholder="0x..."
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="distribution-type">Type of Distribution</Label>
+        <Select value={distributionType} onValueChange={setDistributionType}>
+          <SelectTrigger id="distribution-type">
+            <SelectValue placeholder="Select the type of distribution" />
+          </SelectTrigger>
+          <SelectContent className="select-content">
+            <SelectItem value="equal">Equal</SelectItem>
+            <SelectItem value="weighted">Weighted</SelectItem>
+            <SelectItem value="custom">Custom</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="distribution-details">Distribution Details</Label>
+        <Input
+          id="distribution-details"
+          value={distribution}
+          onChange={(e) => setDistribution(e.target.value)}
+          placeholder="Format: quantity,address,..."
+        />
+      </div>
+    </CardContent>
+    <CardFooter>
+      <Button
+        onClick={handleCreateDistribution}
+        disabled={!selectedPool || !distributionAddress || !distributionType}
+      >
+        Create Distribution
+      </Button>
+      <Button backgroundColor="green.300" onClick={signer}>
+    Send Distribution
+  </Button>
+    </CardFooter>
+  </Card>
   );
 }
 

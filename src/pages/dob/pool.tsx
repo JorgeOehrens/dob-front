@@ -7,7 +7,7 @@ import ViewPools from "@/components/PoolComponents/Pool/Details";
 import { CONTRACT_DATA } from "@/app/consts";
 import SailsCalls from "@/app/SailsCalls";
 import { createClient } from "@supabase/supabase-js";
-
+import { ClaimRewards } from "@/components/PoolComponents/Claim/ClaimPool";
 const supabase = createClient("https://lwmvtiydijytxugorjrd.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3bXZ0aXlkaWp5dHh1Z29yanJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUyNDQ1ODcsImV4cCI6MjA1MDgyMDU4N30.hGCsLUY_N9RyJg0iebs5IgONMhKjv3lMgkuj_zcOZMY");
 
 
@@ -69,18 +69,21 @@ export const Pool = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Dob Protocol UI</h1>
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value)}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="create-pool" className={activeTab === "create-pool" ? "bg-green-300 " : ""}>
-            Crear Pool
+            Create Pool
           </TabsTrigger>
           <TabsTrigger value="add-participants" className={activeTab === "add-participants" ? "bg-green-300 " : ""}>
-            Agregar Participantes
+            Added Participants
           </TabsTrigger>
           <TabsTrigger value="create-distribution" className={activeTab === "create-distribution" ? "bg-green-300 " : ""}>
-            Crear Distribución
+            Create Distribution 
+          </TabsTrigger>
+          <TabsTrigger value="view-claim" className={activeTab === "view-claim" ? "bg-green-300 " : ""}>
+            Claim
           </TabsTrigger>
           <TabsTrigger value="view-pools" className={activeTab === "view-pools" ? "bg-green-300 " : ""}>
-            Ver Pools
+            View Pools
           </TabsTrigger>
         </TabsList>
         <TabsContent value="create-pool">
@@ -108,6 +111,15 @@ export const Pool = () => {
             distribution={distribution}
             setDistribution={setDistribution}
             handleCreateDistribution={handleCreateDistribution}
+          />
+        </TabsContent>
+        <TabsContent value="view-claim">
+          <ClaimRewards 
+          pools={pools}
+          selectedPool={selectedPool}
+          setSelectedPool={setSelectedPool}
+          handleClaimRewards={handleAddParticipant}
+
           />
         </TabsContent>
         <TabsContent value="view-pools">
