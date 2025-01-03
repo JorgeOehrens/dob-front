@@ -1,9 +1,10 @@
 import { HexString } from "@gear-js/api";
 import {KeyringPair} from "@polkadot/keyring/types";
 import { createContext, useContext, useState } from "react";
+import React from 'react';
 
 interface Props {
-    children: JSX.Element
+    children: React.ReactNode;
 }
 
 interface DAppContextI {

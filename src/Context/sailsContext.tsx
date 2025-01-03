@@ -1,8 +1,7 @@
 import React, { createContext, useState } from "react";
 import SailsCalls from "@/app/SailsCalls";
-
 interface Props {
-    children: JSX.Element
+    children: React.ReactNode;
 }
 
 interface SailsContextI {
