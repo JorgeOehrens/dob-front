@@ -4603,13 +4603,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/prop-types@npm:*":
-  version: 15.7.14
-  resolution: "@types/prop-types@npm:15.7.14"
-  checksum: 10c0/1ec775160bfab90b67a782d735952158c7e702ca4502968aa82565bd8e452c2de8601c8dfe349733073c31179116cf7340710160d3836aa8a1ef76d1532893b1
-  languageName: node
-  linkType: hard
-
 "@types/react-dom@npm:18.2.14":
   version: 18.2.14
   resolution: "@types/react-dom@npm:18.2.14"
@@ -4619,30 +4612,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*":
+"@types/react@npm:*, @types/react@npm:^19.0.2":
   version: 19.0.2
   resolution: "@types/react@npm:19.0.2"
   dependencies:
     csstype: "npm:^3.0.2"
   checksum: 10c0/8992f39701fcf1bf893ef8f94a56196445667baf08fe4f6050a14e229a17aad3265ad3efc01595ff3b4d5d5c69da885f9aa4ff80f164a613018734efcff1eb8f
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:18.2.33":
-  version: 18.2.33
-  resolution: "@types/react@npm:18.2.33"
-  dependencies:
-    "@types/prop-types": "npm:*"
-    "@types/scheduler": "npm:*"
-    csstype: "npm:^3.0.2"
-  checksum: 10c0/d3392785660d78121541403a5d1da57dc79e8ce402769251a626aa06a6886a6aaead868a01ee473661380ddd4ac79743de78853d69f652544da191d435f78afb
-  languageName: node
-  linkType: hard
-
-"@types/scheduler@npm:*":
-  version: 0.23.0
-  resolution: "@types/scheduler@npm:0.23.0"
-  checksum: 10c0/5cf7f2ba3732b74877559eb20b19f95fcd0a20c17dcb20e75a7ca7c7369cd455aeb2d406b3ff5a38168a9750da3bad78dd20d96d11118468b78f4959b8e56090
   languageName: node
   linkType: hard
 
@@ -10111,7 +10086,7 @@ __metadata:
     "@tanstack/react-table": "npm:8.9.3"
     "@types/crypto-js": "npm:^4"
     "@types/node": "npm:18.16.19"
-    "@types/react": "npm:18.2.33"
+    "@types/react": "npm:^19.0.2"
     "@types/react-dom": "npm:18.2.14"
     "@vitejs/plugin-react-swc": "npm:3.3.2"
     autoprefixer: "npm:10.4.14"
