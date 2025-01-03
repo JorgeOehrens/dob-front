@@ -26,7 +26,6 @@ const fetchWasmCode = async () => {
     return null;
   }
 };
-
 export function CreatePoolForm() {
   const [sailsCalls, setSailsCalls] = useState<SailsCalls | null>(null);
   const [poolName, setPoolName] = useState("");
@@ -34,10 +33,10 @@ export function CreatePoolForm() {
   const [initialAmount, setInitialAmount] = useState("");
   const [access, setAccess] = useState("");
   const [distributionMode, setDistributionMode] = useState("");
-  const [participants, setParticipants] = useState<string[]>([]); // Use string[]
+  const [participants, setParticipants] = useState<{ address: string; tokens: number }[]>([]);
   const [newParticipant, setNewParticipant] = useState("");
+  const [totalTokens, setTotalTokens] = useState(0);
 
-  // Inicializar SailsCalls al montar el componente
   useEffect(() => {
     const initSailsCalls = async () => {
       const instance = await SailsCalls.new({
@@ -53,14 +52,41 @@ export function CreatePoolForm() {
 
   const handleAddParticipant = () => {
     if (newParticipant.trim() !== "") {
-      setParticipants((prev) => [...prev, newParticipant.trim()]); // Add as a string
+      setParticipants((prev) => [
+        ...prev,
+        { address: newParticipant.trim(), tokens: 0 },
+      ]);
       setNewParticipant("");
     }
   };
 
-
   const handleRemoveParticipant = (index: number) => {
-    setParticipants((prev) => prev.filter((_, i) => i !== index));
+    setParticipants((prev) => {
+      const newParticipants = prev.filter((_, i) => i !== index);
+      updateTotalTokens(newParticipants);
+      return newParticipants;
+    });
+  };
+
+  const handleTokenChange = (index: number, tokens: number) => {
+    setParticipants((prev) => {
+      const newParticipants = [...prev];
+      newParticipants[index].tokens = tokens;
+      updateTotalTokens(newParticipants);
+      return newParticipants;
+    });
+  };
+
+  const updateTotalTokens = (updatedParticipants: typeof participants) => {
+    const total = updatedParticipants.reduce((sum, p) => sum + p.tokens, 0);
+    setTotalTokens(total);
+  };
+
+  const calculateShares = () => {
+    return participants.map((p) => ({
+      ...p,
+      share: totalTokens > 0 ? ((p.tokens / totalTokens) * 100).toFixed(2) : "0.00",
+    }));
   };
 
   const handleCreatePool = async () => {
@@ -126,7 +152,7 @@ export function CreatePoolForm() {
         tipo: poolType,
         creador: account.address,
         participantes: participants,
-        transacciones: [{ txHash }], // Almacena las transacciones con el hash inicial
+        transacciones: [{ txHash }], 
       });
 
       } else {
@@ -175,6 +201,7 @@ export function CreatePoolForm() {
             placeholder="Enter the initial amount"
           />
         </div>
+        
         <div className="space-y-2">
           <Label htmlFor="access">Access</Label>
           <Select value={access} onValueChange={setAccess}>
@@ -199,6 +226,7 @@ export function CreatePoolForm() {
             </SelectContent>
           </Select>
         </div>
+
         <div className="space-y-2">
           <Label>Participants</Label>
           <div className="flex space-x-2">
@@ -210,19 +238,39 @@ export function CreatePoolForm() {
             <Button onClick={handleAddParticipant}>Add</Button>
           </div>
           <ul className="list-disc pl-6">
-            {participants.map((participant, index) => (
-              <li key={index} className="flex items-center space-x-2">
-                <span>{participant}</span>
-                <Button variant="ghost" size="sm" onClick={() => handleRemoveParticipant(index)}>
-                  Remove
-                </Button>
+            {calculateShares().map((participant, index) => (
+              <li key={index} className="flex flex-col space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span>{participant.address}</span>
+                  <Input
+                    type="number"
+                    value={participant.tokens}
+                    onChange={(e) =>
+                      handleTokenChange(index, Number(e.target.value))
+                    }
+                    placeholder="Tokens"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveParticipant(index)}
+                  >
+                    Remove
+                  </Button>
+                </div>
+                <span>
+                  Share: {participant.share}%
+                </span>
               </li>
             ))}
           </ul>
         </div>
+        <div>
+          <Label>Total Tokens: {totalTokens}</Label>
+        </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleCreatePool}>Create Pool</Button>
+          <Button onClick={handleCreatePool}>Create Pool</Button>
       </CardFooter>
     </Card>
   );
