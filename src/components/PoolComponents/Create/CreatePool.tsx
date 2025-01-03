@@ -7,8 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import SailsCalls from "@/app/SailsCalls";
 import { useState, useEffect } from "react";
 import { web3Enable, web3Accounts, web3FromSource } from "@polkadot/extension-dapp";
-import { Program } from "../../../../meta/src/lib";
-import { CONTRACT_DATA } from "@/app/consts";
+import { Program as ProgramPool } from "../../../../meta/pool/src/lib";
+import {Program as ProgramVtf} from "../../../../meta/vtf/src/lib";
+import { CONTRACT_DATA,CONTRACT_DATA_POOL, CONTRACT_DATA_TOKEN } from "@/app/consts";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient("https://lwmvtiydijytxugorjrd.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3bXZ0aXlkaWp5dHh1Z29yanJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUyNDQ1ODcsImV4cCI6MjA1MDgyMDU4N30.hGCsLUY_N9RyJg0iebs5IgONMhKjv3lMgkuj_zcOZMY");
@@ -41,7 +42,7 @@ export function CreatePoolForm() {
     const initSailsCalls = async () => {
       const instance = await SailsCalls.new({
         network: "wss://testnet.vara.network",
-        idl: CONTRACT_DATA.idl,
+        idl: CONTRACT_DATA_POOL.idl,
       });
       setSailsCalls(instance);
       console.log("SailsCalls inicializado:", instance);
@@ -122,7 +123,7 @@ export function CreatePoolForm() {
       }
 
       // Configurar y calcular gas para el programa
-      const program = new Program(gearApi);
+      const program = new ProgramPool(gearApi);
       const ctorBuilder = await program
         .newCtorFromCode(
           code,
@@ -162,6 +163,89 @@ export function CreatePoolForm() {
       console.error("Error al interactuar con GearApi:", error);
     }
   };
+
+  const handleCreateToken = async () => {
+    try {
+      // Habilitar Polkadot.js
+
+      const initSailsCalls = async () => {
+        const instance = await SailsCalls.new({
+          network: "wss://testnet.vara.network",
+          idl: CONTRACT_DATA_TOKEN.idl,
+        });
+        setSailsCalls(instance);
+        console.log("SailsCalls inicializado:", instance);
+      };
+  
+      initSailsCalls().catch((err) => console.error("Error al inicializar SailsCalls:", err));
+      const extensions = await web3Enable("TuAplicacion");
+      if (!extensions.length) {
+        console.error("Polkadot.js extension no está habilitada.");
+        return;
+      }
+
+      // Obtener cuentas disponibles
+      const allAccounts = await web3Accounts();
+      if (!allAccounts.length) {
+        console.error("No se encontraron cuentas en la wallet.");
+        return;
+      }
+
+      // Seleccionar la primera cuenta
+      const account = allAccounts[0];
+      const injector = await web3FromSource(account.meta.source);
+
+      // Configurar el API de Gear
+      if (sailsCalls) {
+        const gearApi = sailsCalls.getGearApi();
+        gearApi.setSigner(injector.signer);
+
+      // Cargar el código WASM
+      const code = await fetchWasmCode();
+      if (!code) {
+        console.error("No se pudo cargar el archivo WASM");
+        return;
+      }
+
+      // Configurar y calcular gas para el programa
+      const program = new ProgramVtf(gearApi);
+      const ctorBuilder = await program
+        .newCtorFromCode(
+          code,
+          poolName,
+          'DOB',
+          18,
+        
+        )
+        .withAccount(account.address)
+        .calculateGas(); 
+
+      // Firmar y enviar la transacción
+      const { blockHash, msgId, txHash } = await ctorBuilder.signAndSend();
+
+      console.log(
+        `\nProgram deployed.\n\tprogram id ${program.programId},\n\tblock hash: ${blockHash},\n\ttx hash: ${txHash},\n\tinit message id: ${msgId}`
+      );
+
+      // Insertar datos en la tabla `pools` de Supabase
+
+      const { error } = await supabase.from("tokens").insert({
+        name: poolName,
+        symbol: 'DOB',
+        decimal :18 ,
+        txHash :txHash,
+        programId :program.programId,
+        owner: account.address
+      });
+
+      } else {
+        console.error("sailsCalls is null");
+      }
+    } catch (error) {
+      console.error("Error al interactuar con GearApi:", error);
+    }
+  };
+
 
   return (
     <Card>
@@ -270,7 +354,7 @@ export function CreatePoolForm() {
         </div>
       </CardContent>
       <CardFooter>
-          <Button onClick={handleCreatePool}>Create Pool</Button>
+          <Button onClick={handleCreateToken}>Create Pool</Button>
       </CardFooter>
     </Card>
   );
