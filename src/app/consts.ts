@@ -17,7 +17,7 @@ export const ROUTES = {
   HOME: '/',
   DOB: '/dob',
 
-  EXAMPLES: '/examples',
+  EXAMPLES: '/examples2',
   NOTFOUND: '*',
 };
 
