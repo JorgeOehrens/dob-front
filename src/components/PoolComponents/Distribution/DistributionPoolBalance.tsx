@@ -1,132 +1,136 @@
+import React from "react";
 import { useAccount, useAlert } from "@gear-js/react-hooks";
 import { web3Enable, web3FromSource } from "@polkadot/extension-dapp";
 import { Button } from "@chakra-ui/react";
-import { useSailsCalls } from "@/app/hooks";
-
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CONTRACT_DATA_POOL } from "@/app/consts";
+import SailsCalls from "@/app/SailsCalls";
+import { stringToHex } from "@polkadot/util";
 
+interface Pool {
+  id: string;
+  nombre: string;
+  id_vara: string;
+}
 
 interface DistributionPoolBalanceProps {
-  pools: any;
-  selectedPool: any;
-  setSelectedPool: any;
-  distributionAddress: any;
-  setDistributionAddress: any;
-  distributionType: any;
-  setDistributionType: any;
-  distribution: any;
-  setDistribution: any;
-  handleCreateDistribution: any;
+  pools: Pool[]; // Lista de pools disponibles
 }
-interface Pool {
-  id: string; // or number, depending on your data
-  name: string;
-}
-function DistributionPoolBalance({ pools, selectedPool, setSelectedPool, distributionAddress, setDistributionAddress, distributionType, setDistributionType, distribution, setDistribution, handleCreateDistribution }: DistributionPoolBalanceProps) {
-  const sails = useSailsCalls();
+
+const DistributionPoolBalance: React.FC<DistributionPoolBalanceProps> = ({
+  pools
+}) => {
   const alert = useAlert();
   const { account } = useAccount();
+  const [selectedPool, setSelectedPool] = React.useState<string>("");
+  console.log(pools);
 
-  const signer = async () => {
-    if (!account) {
-      alert.error("Account not available to sign");
-      return;
-    }
-
-    if (!sails) {
-      alert.error('SailsCalls is not ready');
-      return;
-    }
-    await web3Enable('my dapp');
-    const { signer } = await web3FromSource(account.meta.source);
-
-    const response = await sails.command(
-      'Pool/DistributionPoolBalance',
-      {
-        userAddress: account.decodedAddress,
-        signer
-      },
-      {
-        callbacks: {
-          onLoad() { alert.info('Will send a message'); },
-          onBlock(blockHash) { alert.success(`In block: ${blockHash}`); },
-          onSuccess() { alert.success('Message send!'); },
-          onError() { alert.error('Error while sending message'); }
-        }
+  const handleSendDistribution = async () => {
+    try {
+      if (!selectedPool) {
+        alert.error("Please select a pool.");
+        return;
       }
-    );
 
-    console.log(`response: ${response}`);
+      if (!account) {
+        alert.error("Account not available to sign.");
+        return;
+      }
+
+      const sails = await SailsCalls.new({
+        network: "wss://testnet.vara.network",
+        contractId: stringToHex(selectedPool),
+        idl: CONTRACT_DATA_POOL.idl,
+      });
+
+      if (!sails) {
+        alert.error("SailsCalls is not ready.");
+        return;
+      }
+
+      await web3Enable("my dapp");
+      const { signer } = await web3FromSource(account.meta.source);
+
+      const response = await sails.command(
+        "VftManager/Distribution",
+        {
+          userAddress: account.decodedAddress,
+          signer,
+        },
+        {
+          callbacks: {
+            onLoad() {
+              alert.info("Sending distribution...");
+            },
+            onBlock(blockHash) {
+              alert.success(`Distribution included in block: ${blockHash}`);
+            },
+            onSuccess() {
+              alert.success("Distribution successfully sent!");
+            },
+            onError() {
+              alert.error("Error while sending distribution.");
+            },
+          },
+        }
+      );
+
+      console.log("Distribution response:", response);
+    } catch (error) {
+      console.error("Error in handleSendDistribution:", error);
+      alert.error("Unexpected error occurred during distribution.");
+    }
   };
 
   return (
     <Card>
-    <CardHeader>
-      <CardTitle>Create Distribution</CardTitle>
-      <CardDescription>Create a new distribution for an existing pool.</CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="distribution-pool">Select Pool</Label>
-        <Select value={selectedPool} onValueChange={setSelectedPool}>
-          <SelectTrigger id="distribution-pool">
-            <SelectValue placeholder="Select a pool" />
-          </SelectTrigger>
-          <SelectContent className="select-content">
-          {pools.map((pool: Pool) => (
-              <SelectItem key={pool.id} value={pool.id}>{pool.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="distribution-address">Distribution Contract Address</Label>
-        <Input
-          id="distribution-address"
-          value={distributionAddress}
-          onChange={(e) => setDistributionAddress(e.target.value)}
-          placeholder="0x..."
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="distribution-type">Type of Distribution</Label>
-        <Select value={distributionType} onValueChange={setDistributionType}>
-          <SelectTrigger id="distribution-type">
-            <SelectValue placeholder="Select the type of distribution" />
-          </SelectTrigger>
-          <SelectContent className="select-content">
-            <SelectItem value="equal">Equal</SelectItem>
-            <SelectItem value="weighted">Weighted</SelectItem>
-            <SelectItem value="custom">Custom</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="distribution-details">Distribution Details</Label>
-        <Input
-          id="distribution-details"
-          value={distribution}
-          onChange={(e) => setDistribution(e.target.value)}
-          placeholder="Format: quantity,address,..."
-        />
-      </div>
-    </CardContent>
-    <CardFooter>
-      <Button
-        onClick={handleCreateDistribution}
-        disabled={!selectedPool || !distributionAddress || !distributionType}
-      >
-        Create Distribution
-      </Button>
-      <Button backgroundColor="green.300" onClick={signer}>
-    Send Distribution
-  </Button>
-    </CardFooter>
-  </Card>
+      <CardHeader>
+        <CardTitle>Create Distribution</CardTitle>
+        <CardDescription>Select a pool and send a distribution.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="distribution-pool">Select Pool</Label>
+          <Select value={selectedPool} onValueChange={setSelectedPool}>
+            <SelectTrigger id="distribution-pool">
+              <SelectValue placeholder="Select a pool" />
+            </SelectTrigger>
+            <SelectContent className="select-content">
+              {pools.map((pool) => (
+                <SelectItem key={pool.id} value={pool.id_vara}>
+                  {pool.nombre}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button
+          backgroundColor="green.300"
+          onClick={handleSendDistribution}
+          disabled={!selectedPool}
+        >
+          Send Distribution
+        </Button>
+      </CardFooter>
+    </Card>
   );
-}
+};
 
 export { DistributionPoolBalance };

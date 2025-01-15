@@ -58,59 +58,78 @@ export const CONTRACT_DATA: ContractSails = {
 export const CONTRACT_DATA_POOL: ContractSails = {
   programId: '0xe9ab0477153cd3b0fb57c4a35a08f71b615d585bfdf3016e78ff00833f2b3bd5',
   idl: `
-    type State = struct {
-  name: str,
-  type_pool: str,
-  distribution_mode: str,
-  access_type: str,
-  transactions: vec struct { u256, Transaction },
-  confirmations: vec struct { u256, vec actor_id },
-  owners: vec actor_id,
-  participants_pool: vec actor_id,
-  required: u32,
-  transaction_count: u256,
+type VftManagerEvents = enum {
+  NewAdminAdded: actor_id,
+  NewParticipant: actor_id,
+  RefundOfVaras: u128,
+  VFTContractIdSet,
+  MinTokensToAddSet,
+  MaxTokensToBurnSet,
+  TokensAdded,
+  TokensBurned,
+  SetTokensPerVaras,
+  TotalSwapInVaras: u128,
+  TokensSwapSuccessfully: struct { total_tokens: u128, total_varas: u128 },
+  RewardsClaimed: struct { total_rewards: u128 },
+  Error: VftManagerErrors,
 };
 
+type VftManagerErrors = enum {
+  MinTokensToAdd: u128,
+  NoPendingRewards,
+  FailedToSendRewards,
+  MaxTokensToBurn: u128,
+  InsufficientTokens: struct { total_contract_suply: u128, tokens_to_burn: u128 },
+  CantSwapTokens: struct { tokens_in_vft_contract: u256 },
+  CantSwapUserTokens: struct { user_tokens: u256, tokens_to_swap: u256 },
+  ContractCantMint,
+  CantSwapTokensWithAmount: struct { min_amount: u128, actual_amount: u128 },
+  OnlyAdminsCanDoThatAction,
+  VftContractIdNotSet,
+  ErrorInVFTContract,
+  ErrorInGetNumOfVarasToSwap,
+  OperationWasNotPerformed,
+};
+
+type VftManagerQueryEvents = enum {
+  ContractBalanceInVaras: u128,
+  PoolDetails: struct { admins: vec actor_id, name: str, type_pool: str, distribution_mode: str, access_type: str, participants: vec actor_id, vft_contract_id: opt actor_id, transaction_count: u256, transactions: vec struct { u256, Transaction } },
+  PendingRewards: struct { address: actor_id, total_rewards: u128, transactions: vec Transaction },
+  Rewards: vec struct { u256, Transaction, bool },
+  UserTotalTokensAsU128: u128,
+  UserTotalTokens: u256,
+  TotalTokensToSwap: u256,
+  TotalTokensToSwapAsU128: u128,
+  TokensToSwapOneVara: u128,
+  NumOfTokensForOneVara: u128,
+  Error: VftManagerErrors,
+};
 
 type Transaction = struct {
   destination: actor_id,
-  payload: vec u8,
   value: u128,
-  description: opt str,
   executed: bool,
 };
 
 constructor {
-  New : (name: str, type_pool: str, distribution_mode: str, access_type: str, owners: vec actor_id, participants_pool: vec actor_id, required: u32);
+  New : ();
+  NewWithData : (name: str, type_pool: str, distribution_mode: str, access_type: str, participants: vec actor_id, vft_contract_id: opt actor_id, admins: vec actor_id);
 };
 
-service Pool {
-  AddOwner : (owner: actor_id) -> null;
-  AddParticipant : (participant: actor_id) -> null;
-  ChangeRequiredConfirmationsCount : (count: u32) -> null;
-  ConfirmTransaction : (transaction_id: u256) -> null;
-  DistributionPool : (data: vec u8, total_value: u128, description: opt str) -> null;
-  DistributionPool2 : (participants: vec actor_id, data: vec u8, total_value: u128, description: opt str) -> null;
-  DistributionPoolBalance : (data: vec u8, description: opt str) -> null;
-  ExecuteTransaction : (transaction_id: u256) -> null;
-  RemoveOwner : (owner: actor_id) -> null;
-  ReplaceOwner : (old_owner: actor_id, new_owner: actor_id) -> null;
-  RevokeConfirmation : (transaction_id: u256) -> null;
-  SubmitTransaction : (destination: actor_id, data: vec u8, value: u128, description: opt str) -> null;
-  query GetState : () -> State;
-
-  events {
-    Confirmation: struct { sender: actor_id, transaction_id: u256 };
-    Revocation: struct { sender: actor_id, transaction_id: u256 };
-    Submission: struct { transaction_id: u256 };
-    Execution: struct { transaction_id: u256 };
-    OwnerAddition: struct { owner: actor_id };
-    PaticipantAddition: struct { participant: actor_id };
-    OwnerRemoval: struct { owner: actor_id };
-    OwnerReplace: struct { old_owner: actor_id, new_owner: actor_id };
-    RequirementChange: u256;
-  }
+service VftManager {
+  AddAdmin : (new_admin_address: actor_id) -> VftManagerEvents;
+  AddParticipant : (participant: actor_id) -> VftManagerEvents;
+  AddTransaction : (destination: actor_id, value: u128) -> u256;
+  Distribution : () -> null;
+  DistributionPoolBalance : () -> null;
+  RewardsClaimed : (address: actor_id) -> VftManagerEvents;
+  SetVftContractId : (vft_contract_id: actor_id) -> VftManagerEvents;
+  query PendingRewards : (address: actor_id) -> VftManagerQueryEvents;
+  query PoolDetails : () -> VftManagerQueryEvents;
+  query Rewards : () -> VftManagerQueryEvents;
 };
+
+
   `
 };
 
@@ -122,35 +141,107 @@ export const CONTRACT_DATA_TOKEN: ContractSails = {
   programId: '0xe9ab0477153cd3b0fb57c4a35a08f71b615d585bfdf3016e78ff00833f2b3bd5',
   idl: `constructor {
   New : (name: str, symbol: str, decimals: u8);
-  };
+};
 
-  service Vft {
-    Burn : (from: actor_id, value: u256) -> bool;
-    GrantAdminRole : (to: actor_id) -> null;
-    GrantBurnerRole : (to: actor_id) -> null;
-    GrantMinterRole : (to: actor_id) -> null;
-    Mint : (to: actor_id, value: u256) -> bool;
-    RevokeAdminRole : (from: actor_id) -> null;
-    RevokeBurnerRole : (from: actor_id) -> null;
-    RevokeMinterRole : (from: actor_id) -> null;
-    Approve : (spender: actor_id, value: u256) -> bool;
-    Transfer : (to: actor_id, value: u256) -> bool;
-    TransferFrom : (from: actor_id, to: actor_id, value: u256) -> bool;
-    query Admins : () -> vec actor_id;
-    query Burners : () -> vec actor_id;
-    query Minters : () -> vec actor_id;
-    query Allowance : (owner: actor_id, spender: actor_id) -> u256;
-    query BalanceOf : (account: actor_id) -> u256;
-    query Decimals : () -> u8;
-    query Name : () -> str;
-    query Symbol : () -> str;
-    query TotalSupply : () -> u256;
+service Vft {
+  Burn : (from: actor_id, value: u256) -> bool;
+  DistributeShares : (shares_list: vec struct { actor_id, u256 }) -> bool;
+  GrantAdminRole : (to: actor_id) -> null;
+  GrantBurnerRole : (to: actor_id) -> null;
+  GrantMinterRole : (to: actor_id) -> null;
+  Mint : (to: actor_id, value: u256) -> bool;
+  RevokeAdminRole : (from: actor_id) -> null;
+  RevokeBurnerRole : (from: actor_id) -> null;
+  RevokeMinterRole : (from: actor_id) -> null;
+  Approve : (spender: actor_id, value: u256) -> bool;
+  Transfer : (to: actor_id, value: u256) -> bool;
+  TransferFrom : (from: actor_id, to: actor_id, value: u256) -> bool;
+  query Admins : () -> vec actor_id;
+  query Burners : () -> vec actor_id;
+  query Minters : () -> vec actor_id;
+  query Allowance : (owner: actor_id, spender: actor_id) -> u256;
+  query BalanceOf : (account: actor_id) -> u256;
+  query Decimals : () -> u8;
+  query Name : () -> str;
+  query Symbol : () -> str;
+  query TotalSupply : () -> u256;
 
-    events {
-      Minted: struct { to: actor_id, value: u256 };
-      Burned: struct { from: actor_id, value: u256 };
-      Approval: struct { owner: actor_id, spender: actor_id, value: u256 };
-      Transfer: struct { from: actor_id, to: actor_id, value: u256 };
-    }
-  };`
+  events {
+    Minted: struct { to: actor_id, value: u256 };
+    Burned: struct { from: actor_id, value: u256 };
+    Approval: struct { owner: actor_id, spender: actor_id, value: u256 };
+    Transfer: struct { from: actor_id, to: actor_id, value: u256 };
+  }
+};
+
+`
+};
+
+
+
+
+export const CONTRACT_FACTORY: ContractSails = {
+  programId: '0x1d81c3f5dab56d5a3ba50b3ecfd5c0cdb52e47ea8cfc63291693998ff9e45ba2',
+  idl: `type InitConfigFactory = struct {
+  vft_code_id: code_id,
+  pool_code_id: code_id,
+  factory_admin_account: vec actor_id,
+  gas_for_program: u64,
+};
+
+type FactoryEvent = enum {
+  ProgramCreated: struct { id: u64, vft_address: actor_id, pool_address: actor_id, init_config: InitConfig },
+  GasUpdatedSuccessfully: struct { updated_by: actor_id, new_gas_amount: u64 },
+  CodeIdUpdatedSuccessfully: struct { updated_by: actor_id, new_code_id: code_id },
+  AdminAdded: struct { updated_by: actor_id, admin_actor_id: actor_id },
+  RegistryRemoved: struct { removed_by: actor_id, program_for_id: u64 },
+};
+
+type InitConfig = struct {
+  name: str,
+  symbol: str,
+  decimals: u8,
+  type_pool: str,
+  distribution_mode: str,
+  access_type: str,
+  participants: vec actor_id,
+};
+
+type FactoryError = enum {
+  ProgramInitializationFailed,
+  ProgramInitializationFailedWithContext: str,
+  Unauthorized,
+  UnexpectedFTEvent,
+  MessageSendError,
+  NotFound,
+  IdNotFoundInAddress,
+  IdNotFound,
+};
+
+type Record = struct {
+  name: str,
+};
+
+constructor {
+  New : (init: InitConfigFactory);
+};
+
+service Factory {
+  AddAdminToFactory : (admin_actor_id: actor_id) -> result (FactoryEvent, FactoryError);
+  CreatePool : (init_config: InitConfig, vft_address: actor_id) -> result (actor_id, FactoryError);
+  CreateVft : (init_config: InitConfig) -> result (actor_id, FactoryError);
+  CreateVftAndPool : (init_config: InitConfig) -> result (FactoryEvent, FactoryError);
+  RemoveRegistry : (program_for_id: u64) -> result (FactoryEvent, FactoryError);
+  UpdateCodeId : (new_vft_code_id: opt code_id, new_pool_code_id: opt code_id) -> result (FactoryEvent, FactoryError);
+  UpdateGasForProgram : (new_gas_amount: u64) -> result (FactoryEvent, FactoryError);
+  query Admins : () -> vec actor_id;
+  query GasForProgram : () -> u64;
+  query IdToAddress : () -> vec struct { u64, actor_id };
+  query Number : () -> u64;
+  query PoolCodeId : () -> code_id;
+  query Registry : () -> vec struct { actor_id, vec struct { u64, Record } };
+  query VftCodeId : () -> code_id;
+};
+
+`
 };

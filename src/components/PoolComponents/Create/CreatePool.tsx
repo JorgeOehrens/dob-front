@@ -7,16 +7,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import SailsCalls from "@/app/SailsCalls";
 import { useState, useEffect } from "react";
 import { web3Enable, web3Accounts, web3FromSource } from "@polkadot/extension-dapp";
-import { Program as ProgramPool } from "../../../../meta/pool/src/lib";
-import {Program as ProgramVtf} from "../../../../meta/vtf/src/lib";
-import { CONTRACT_DATA,CONTRACT_DATA_POOL, CONTRACT_DATA_TOKEN } from "@/app/consts";
+import { useSailsCalls } from "@/app/hooks";
+import { useAccount, useAlert } from "@gear-js/react-hooks";
+import { useInitSails } from "@/app/hooks";
+
+import {  CONTRACT_DATA_TOKEN, CONTRACT_FACTORY,  sponsorName, sponsorMnemonic, } from "@/app/consts";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient("https://lwmvtiydijytxugorjrd.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3bXZ0aXlkaWp5dHh1Z29yanJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUyNDQ1ODcsImV4cCI6MjA1MDgyMDU4N30.hGCsLUY_N9RyJg0iebs5IgONMhKjv3lMgkuj_zcOZMY");
 
 const fetchWasmCode = async () => {
   try {
-    const response = await fetch("../../../../wasm/wasm.opt.wasm");
+    const response = await fetch("../../../../wasm/factory/wasm.wasm");
     if (!response.ok) {
       throw new Error("Error al cargar el archivo WASM");
     }
@@ -27,29 +29,17 @@ const fetchWasmCode = async () => {
     return null;
   }
 };
+
 export function CreatePoolForm() {
-  const [sailsCalls, setSailsCalls] = useState<SailsCalls | null>(null);
   const [poolName, setPoolName] = useState("");
   const [poolType, setPoolType] = useState("");
   const [initialAmount, setInitialAmount] = useState("");
   const [access, setAccess] = useState("");
   const [distributionMode, setDistributionMode] = useState("");
-  const [participants, setParticipants] = useState<{ address: string; tokens: number }[]>([]);
+  const [participantsForm, setParticipants] = useState<{ address: string; tokens: number }[]>([]);
   const [newParticipant, setNewParticipant] = useState("");
   const [totalTokens, setTotalTokens] = useState(0);
 
-  useEffect(() => {
-    const initSailsCalls = async () => {
-      const instance = await SailsCalls.new({
-        network: "wss://testnet.vara.network",
-        idl: CONTRACT_DATA_POOL.idl,
-      });
-      setSailsCalls(instance);
-      console.log("SailsCalls inicializado:", instance);
-    };
-
-    initSailsCalls().catch((err) => console.error("Error al inicializar SailsCalls:", err));
-  }, []);
 
   const handleAddParticipant = () => {
     if (newParticipant.trim() !== "") {
@@ -78,173 +68,228 @@ export function CreatePoolForm() {
     });
   };
 
-  const updateTotalTokens = (updatedParticipants: typeof participants) => {
+  const updateTotalTokens = (updatedParticipants: typeof participantsForm) => {
     const total = updatedParticipants.reduce((sum, p) => sum + p.tokens, 0);
     setTotalTokens(total);
   };
 
   const calculateShares = () => {
-    return participants.map((p) => ({
+    return participantsForm.map((p) => ({
       ...p,
       share: totalTokens > 0 ? ((p.tokens / totalTokens) * 100).toFixed(2) : "0.00",
     }));
   };
 
-  const handleCreatePool = async () => {
-    try {
-      // Habilitar Polkadot.js
-      const extensions = await web3Enable("TuAplicacion");
-      if (!extensions.length) {
-        console.error("Polkadot.js extension no está habilitada.");
-        return;
-      }
 
-      // Obtener cuentas disponibles
-      const allAccounts = await web3Accounts();
-      if (!allAccounts.length) {
-        console.error("No se encontraron cuentas en la wallet.");
-        return;
-      }
-
-      // Seleccionar la primera cuenta
-      const account = allAccounts[0];
-      const injector = await web3FromSource(account.meta.source);
-
-      // Configurar el API de Gear
-      if (sailsCalls) {
-        const gearApi = sailsCalls.getGearApi();
-        gearApi.setSigner(injector.signer);
-
-      // Cargar el código WASM
-      const code = await fetchWasmCode();
-      if (!code) {
-        console.error("No se pudo cargar el archivo WASM");
-        return;
-      }
-
-      // Configurar y calcular gas para el programa
-      const program = new ProgramPool(gearApi);
-      const ctorBuilder = await program
-        .newCtorFromCode(
-          code,
-          poolName,
-          poolType,
-          distributionMode,
-          access,
-          ['0xb03bf2970534f469667832e8c5260533589ec2c0e0dbf739d6621dc008b9b342'],
-          ['0xb03bf2970534f469667832e8c5260533589ec2c0e0dbf739d6621dc008b9b342'],
-          1
-        )
-        .withAccount(account.address)
-        .calculateGas();
-        ctorBuilder.withValue(BigInt(Number(initialAmount) * 1e12)); 
-        // Firmar y enviar la transacción
-      const { blockHash, msgId, txHash } = await ctorBuilder.signAndSend();
-
-      console.log(
-        `\nProgram deployed.\n\tprogram id ${program.programId},\n\tblock hash: ${blockHash},\n\ttx hash: ${txHash},\n\tinit message id: ${msgId}`
-      );
-      // Insertar datos en la tabla `pools` de Supabase
-      const { error } = await supabase.from("pools").insert({
-        nombre: poolName,
-        modo_distribucion: distributionMode,
-        id_vara:program.programId,
-        acceso: access,
-        tipo: poolType,
-        creador: account.address,
-        participantes: participants,
-        transacciones: [{ txHash }], 
-      });
-
-      } else {
-        console.error("sailsCalls is null");
-      }
-    } catch (error) {
-      console.error("Error al interactuar con GearApi:", error);
-    }
-  };
-
-  const handleCreateToken = async () => {
-    try {
-      // Habilitar Polkadot.js
-
-      const initSailsCalls = async () => {
-        const instance = await SailsCalls.new({
-          network: "wss://testnet.vara.network",
-          idl: CONTRACT_DATA_TOKEN.idl,
-        });
-        setSailsCalls(instance);
-        console.log("SailsCalls inicializado:", instance);
-      };
+// Put your contract id and idl
+useInitSails({
+  network: 'wss://testnet.vara.network',
+  contractId: CONTRACT_FACTORY.programId,
+  idl: CONTRACT_FACTORY.idl,
+  // You need to put name and mnemonic sponsor if you 
+  // will use vouchers feature (vouchers are used for gasless,
+  // and signless accounts)
+  vouchersSigner: {
+    sponsorName,
+    sponsorMnemonic
+  }
+});
   
-      initSailsCalls().catch((err) => console.error("Error al inicializar SailsCalls:", err));
-      const extensions = await web3Enable("TuAplicacion");
-      if (!extensions.length) {
-        console.error("Polkadot.js extension no está habilitada.");
-        return;
-      }
+const sails = useSailsCalls();
+const alert = useAlert();
+const { account } = useAccount();
 
-      // Obtener cuentas disponibles
-      const allAccounts = await web3Accounts();
-      if (!allAccounts.length) {
-        console.error("No se encontraron cuentas en la wallet.");
-        return;
-      }
 
-      // Seleccionar la primera cuenta
-      const account = allAccounts[0];
-      const injector = await web3FromSource(account.meta.source);
+const distributeShares = async (vftAddress: any) => {
+  try {
+    // Inicializa SailsCalls dinámicamente con el contrato VFT
+    const sails = await SailsCalls.new({
+      network: "wss://testnet.vara.network",
+      contractId: vftAddress,
+      idl: CONTRACT_DATA_TOKEN.idl, // IDL del contrato VFT
+    });
 
-      // Configurar el API de Gear
-      if (sailsCalls) {
-        const gearApi = sailsCalls.getGearApi();
-        gearApi.setSigner(injector.signer);
+    // Prepara los datos para distribuir las shares en formato correcto
+    const sharesList = participantsForm.map((p) => [
+      p.address,          // Dirección del actor en formato hexadecimal
+      p.tokens.toString(), // Número de tokens como string
+    ]);
 
-      // Cargar el código WASM
-      const code = await fetchWasmCode();
-      if (!code) {
-        console.error("No se pudo cargar el archivo WASM");
-        return;
-      }
+    console.log("Shares List (Tuples):", sharesList);
 
-      // Configurar y calcular gas para el programa
-      const program = new ProgramVtf(gearApi);
-      const ctorBuilder = await program
-        .newCtorFromCode(
-          code,
-          poolName,
-          'DOB',
-          18,
-        
-        )
-        .withAccount(account.address)
-        .calculateGas(); 
-
-      // Firmar y enviar la transacción
-      const { blockHash, msgId, txHash } = await ctorBuilder.signAndSend();
-
-      console.log(
-        `\nProgram deployed.\n\tprogram id ${program.programId},\n\tblock hash: ${blockHash},\n\ttx hash: ${txHash},\n\tinit message id: ${msgId}`
-      );
-
-      // Insertar datos en la tabla `pools` de Supabase
-
-      const { error } = await supabase.from("tokens").insert({
-        name: poolName,
-        symbol: 'DOB',
-        decimal :18 ,
-        txHash :txHash,
-        programId :program.programId,
-        owner: account.address
-      });
-
-      } else {
-        console.error("sailsCalls is null");
-      }
-    } catch (error) {
-      console.error("Error al interactuar con GearApi:", error);
+    const extensions = await web3Enable("TuAplicacion");
+    if (!extensions || extensions.length === 0) {
+      alert.error("Polkadot.js extension not enabled or installed");
+      return;
     }
-  };
+
+    if (!account) {
+      alert.error("Account not available to sign");
+      return;
+    }
+
+    if (!sails) {
+      alert.error("SailsCalls is not ready");
+      return;
+    }
+
+    const { signer } = await web3FromSource(account.meta.source);
+
+    await sails.command(
+      "Vft/DistributeShares", 
+      {
+        userAddress: account.decodedAddress,
+        signer,
+      },
+      {
+        callArguments: [sharesList],
+        callbacks: {
+          onLoad() {
+            alert.info("Sending shares distribution...");
+          },
+          onBlock(blockHash) {
+            alert.success(`Shares distributed in block: ${blockHash}`);
+          },
+          onSuccess() {
+            alert.success("Shares successfully distributed!");
+          },
+         
+        },
+      }
+    );
+  } catch (error) {
+    console.error("Error in distributeShares:", error);
+    alert.error("Unexpected error occurred during share distribution");
+  }
+};
+
+
+const signer = async () => {
+  try {
+    // Habilitar Polkadot.js
+    const extensions = await web3Enable("TuAplicacion");
+    if (!extensions || extensions.length === 0) {
+      alert.error("Polkadot.js extension not enabled or installed");
+      return;
+    }
+
+    if (!account) {
+      alert.error("Account not available to sign");
+      return;
+    }
+
+    if (!sails) {
+      alert.error("SailsCalls is not ready");
+      return;
+    }
+
+    // Obtener el firmante
+    const { signer } = await web3FromSource(account.meta.source);
+
+    const initConfig = {
+      name: poolName,
+      symbol: "VFT",
+      decimals: 18,
+      type_pool: poolType,
+      distribution_mode: distributionMode,
+      access_type: access,
+      participants: participantsForm.map((p) => p.address),
+    };
+
+    // Crear la VFT y la pool
+    const response = await sails.command(
+      "Factory/CreateVftAndPool",
+      {
+        userAddress: account.decodedAddress,
+        signer,
+      },
+      {
+        callArguments: [initConfig],
+        callbacks: {
+          onLoad() {
+            alert.info("Will send a message");
+          },
+          onBlock(blockHash) {
+            alert.success(`In block: ${blockHash}`);
+          },
+        },
+      }
+    );
+
+    // Extraer datos del contrato
+    const { programCreated } = response.ok;
+    const { vft_address, pool_address, init_config } = programCreated;
+
+    console.log("VFT Address:", vft_address);
+    console.log("Pool Address:", pool_address);
+
+    // Preparar los datos de las shares
+    const sharesList = participantsForm.map((p) => ({
+      actorId: p.address,
+      shares: p.tokens,
+    }));
+
+    // Guardar el VFT en la tabla `tokens`
+    const tokenInsert = {
+      name: init_config.name,
+      symbol: init_config.symbol,
+      decimal: init_config.decimals,
+      created_at: new Date().toISOString(),
+      owner: account.decodedAddress,
+      txHash: response.blockHash,
+      programId: vft_address,
+      shares: sharesList, // Guardar las shares como JSON
+    };
+
+    const { data: tokenData, error: tokenError } = await supabase
+      .from("tokens")
+      .insert(tokenInsert)
+      .select()
+      .single();
+
+    if (tokenError) {
+      console.error("Error inserting token:", tokenError);
+      alert.error("Failed to save token in database");
+      return;
+    }
+
+    // Guardar la pool en la tabla `pools`
+    const poolInsert = {
+      id_vara: pool_address,
+      nombre: poolName,
+      modo_distribucion: distributionMode,
+      acceso: access,
+      tipo: poolType,
+      creador: account.decodedAddress,
+      participantes: participantsForm,
+      transacciones: [],
+      created_at: new Date().toISOString(),
+      id_token: tokenData.id,
+    };
+
+    const { data: poolData, error: poolError } = await supabase
+      .from("pools")
+      .insert(poolInsert);
+
+    if (poolError) {
+      console.error("Error inserting pool:", poolError);
+      alert.error("Failed to save pool in database");
+      return;
+    }
+
+    alert.success("Pool and VFT successfully created and saved in database!");
+
+    // Retrasar antes de distribuir las shares
+    const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+    await delay(5000);
+
+    // Llamar a la distribución de shares
+    await distributeShares(vft_address);
+  } catch (error) {
+    console.error("Error in signer:", error);
+    alert.error("Unexpected error occurred");
+  }
+};
 
 
   return (
@@ -354,7 +399,7 @@ export function CreatePoolForm() {
         </div>
       </CardContent>
       <CardFooter>
-          <Button onClick={handleCreateToken}>Create Pool</Button>
+          <Button onClick={signer}>Create Pool</Button>
       </CardFooter>
     </Card>
   );
