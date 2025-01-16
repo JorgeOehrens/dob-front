@@ -320,16 +320,7 @@ const signer = async () => {
             </div>
           </RadioGroup>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="initial-amount">Initial Amount</Label>
-          <Input
-            id="initial-amount"
-            type="number"
-            value={initialAmount}
-            onChange={(e) => setInitialAmount(e.target.value)}
-            placeholder="Enter the initial amount"
-          />
-        </div>
+   
         
         <div className="space-y-2">
           <Label htmlFor="access">Access</Label>

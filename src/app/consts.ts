@@ -58,9 +58,10 @@ export const CONTRACT_DATA: ContractSails = {
 export const CONTRACT_DATA_POOL: ContractSails = {
   programId: '0xe9ab0477153cd3b0fb57c4a35a08f71b615d585bfdf3016e78ff00833f2b3bd5',
   idl: `
-type VftManagerEvents = enum {
+  type VftManagerEvents = enum {
   NewAdminAdded: actor_id,
   NewParticipant: actor_id,
+  AddVara,
   RefundOfVaras: u128,
   VFTContractIdSet,
   MinTokensToAddSet,
@@ -93,7 +94,7 @@ type VftManagerErrors = enum {
 
 type VftManagerQueryEvents = enum {
   ContractBalanceInVaras: u128,
-  PoolDetails: struct { admins: vec actor_id, name: str, type_pool: str, distribution_mode: str, access_type: str, participants: vec actor_id, vft_contract_id: opt actor_id, transaction_count: u256, transactions: vec struct { u256, Transaction } },
+  PoolDetails: struct { admins: vec actor_id, name: str, type_pool: str, distribution_mode: str, access_type: str, participants: vec actor_id, vft_contract_id: opt actor_id, transaction_count: u256, transactions: vec struct { u256, Transaction }, last_distribution_time: u64, is_manual: bool },
   PendingRewards: struct { address: actor_id, total_rewards: u128, transactions: vec Transaction },
   Rewards: vec struct { u256, Transaction, bool },
   UserTotalTokensAsU128: u128,
@@ -113,22 +114,24 @@ type Transaction = struct {
 
 constructor {
   New : ();
-  NewWithData : (name: str, type_pool: str, distribution_mode: str, access_type: str, participants: vec actor_id, vft_contract_id: opt actor_id, admins: vec actor_id);
+  NewWithData : (name: str, type_pool: str, distribution_mode: str, access_type: str, participants: vec actor_id, vft_contract_id: opt actor_id, admins: vec actor_id, last_distribution_time: u64, is_manual: bool, period: u64, interval: u64);
 };
 
 service VftManager {
   AddAdmin : (new_admin_address: actor_id) -> VftManagerEvents;
   AddParticipant : (participant: actor_id) -> VftManagerEvents;
   AddTransaction : (destination: actor_id, value: u128) -> u256;
-  Distribution : () -> null;
-  DistributionPoolBalance : () -> null;
+  AddVara : () -> VftManagerEvents;
+  Distribution : (manual: bool) -> null;
   RewardsClaimed : (address: actor_id) -> VftManagerEvents;
+  SetManualMode : (manual: bool) -> null;
   SetVftContractId : (vft_contract_id: actor_id) -> VftManagerEvents;
   query PendingRewards : (address: actor_id) -> VftManagerQueryEvents;
   query PoolDetails : () -> VftManagerQueryEvents;
+  /// ## Returns the total number of tokens in the contract (In U256 format)
+  /// Additionally, it returns all transactions with their execution status.
   query Rewards : () -> VftManagerQueryEvents;
 };
-
 
   `
 };
@@ -181,8 +184,10 @@ service Vft {
 
 
 export const CONTRACT_FACTORY: ContractSails = {
-  programId: '0x1d81c3f5dab56d5a3ba50b3ecfd5c0cdb52e47ea8cfc63291693998ff9e45ba2',
-  idl: `type InitConfigFactory = struct {
+  programId: '0x4acc428f7aa789ce3846e73e9706d1d7774fc1a10ab9e4db7741f3589ba8bc25',
+  idl: `
+
+  type InitConfigFactory = struct {
   vft_code_id: code_id,
   pool_code_id: code_id,
   factory_admin_account: vec actor_id,
@@ -205,6 +210,10 @@ type InitConfig = struct {
   distribution_mode: str,
   access_type: str,
   participants: vec actor_id,
+  last_distribution_time: u64,
+  is_manual: bool,
+  period: u64,
+  interval: u64,
 };
 
 type FactoryError = enum {
@@ -242,6 +251,8 @@ service Factory {
   query Registry : () -> vec struct { actor_id, vec struct { u64, Record } };
   query VftCodeId : () -> code_id;
 };
+
+
 
 `
 };

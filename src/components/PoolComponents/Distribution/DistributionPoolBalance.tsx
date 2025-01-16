@@ -20,12 +20,11 @@ import {
 } from "@/components/ui/select";
 import { CONTRACT_DATA_POOL } from "@/app/consts";
 import SailsCalls from "@/app/SailsCalls";
-import { stringToHex } from "@polkadot/util";
 
 interface Pool {
   id: string;
   nombre: string;
-  id_vara: string;
+  id_vara: any;
 }
 
 interface DistributionPoolBalanceProps {
@@ -54,7 +53,7 @@ const DistributionPoolBalance: React.FC<DistributionPoolBalanceProps> = ({
 
       const sails = await SailsCalls.new({
         network: "wss://testnet.vara.network",
-        contractId: stringToHex(selectedPool),
+        contractId: selectedPool as `0x${string}`,
         idl: CONTRACT_DATA_POOL.idl,
       });
 

@@ -8,6 +8,7 @@ import { CONTRACT_DATA, CONTRACT_FACTORY } from "@/app/consts";
 import SailsCalls from "@/app/SailsCalls";
 import { createClient } from "@supabase/supabase-js";
 import { ClaimRewards } from "@/components/PoolComponents/Claim/ClaimPool";
+import { SendVara } from "@/components/PoolComponents/SendVara/SendVara";
 
 const supabase = createClient(
   "https://lwmvtiydijytxugorjrd.supabase.co",
@@ -79,6 +80,12 @@ export const Pool = () => {
               Create Pool
             </TabsTrigger>
             <TabsTrigger
+              value="send-vara"
+              className={activeTab === "send-vara" ? "bg-green-300 " : ""}
+            >
+              Send Vara
+            </TabsTrigger>
+            <TabsTrigger
               value="create-distribution"
               className={activeTab === "create-distribution" ? "bg-green-300 " : ""}
             >
@@ -102,7 +109,11 @@ export const Pool = () => {
         <TabsContent value="create-pool">
           <CreatePoolForm />
         </TabsContent>
-       
+
+
+        <TabsContent value="send-vara">
+          <SendVara pools={pools} />
+        </TabsContent>
         <TabsContent value="create-distribution">
           <DistributionPoolBalance
             pools={pools}

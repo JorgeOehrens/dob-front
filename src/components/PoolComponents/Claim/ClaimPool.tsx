@@ -63,7 +63,7 @@ function ClaimRewards({ pools }: ClaimRewardsProps) {
 
       const sails = await SailsCalls.new({
         network: "wss://testnet.vara.network",
-        contractId: stringToHex(selectedPool),
+        contractId: selectedPool as `0x${string}`,
         idl: CONTRACT_DATA_POOL.idl,
       });
 
