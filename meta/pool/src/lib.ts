@@ -8,9 +8,9 @@ export class Program {
 
   constructor(public api: GearApi, private _programId?: `0x${string}`) {
     const types: Record<string, any> = {
-      VftManagerEvents: {"_enum":{"NewAdminAdded":"[u8;32]","NewParticipant":"[u8;32]","RefundOfVaras":"u128","VFTContractIdSet":"Null","MinTokensToAddSet":"Null","MaxTokensToBurnSet":"Null","TokensAdded":"Null","TokensBurned":"Null","SetTokensPerVaras":"Null","TotalSwapInVaras":"u128","TokensSwapSuccessfully":{"total_tokens":"u128","total_varas":"u128"},"RewardsClaimed":{"total_rewards":"u128"},"Error":"VftManagerErrors"}},
+      VftManagerEvents: {"_enum":{"NewAdminAdded":"[u8;32]","NewParticipant":"[u8;32]","AddVara":"Null","RefundOfVaras":"u128","VFTContractIdSet":"Null","MinTokensToAddSet":"Null","MaxTokensToBurnSet":"Null","TokensAdded":"Null","TokensBurned":"Null","SetTokensPerVaras":"Null","TotalSwapInVaras":"u128","TokensSwapSuccessfully":{"total_tokens":"u128","total_varas":"u128"},"RewardsClaimed":{"total_rewards":"u128"},"Error":"VftManagerErrors"}},
       VftManagerErrors: {"_enum":{"MinTokensToAdd":"u128","NoPendingRewards":"Null","FailedToSendRewards":"Null","MaxTokensToBurn":"u128","InsufficientTokens":{"total_contract_suply":"u128","tokens_to_burn":"u128"},"CantSwapTokens":{"tokens_in_vft_contract":"U256"},"CantSwapUserTokens":{"user_tokens":"U256","tokens_to_swap":"U256"},"ContractCantMint":"Null","CantSwapTokensWithAmount":{"min_amount":"u128","actual_amount":"u128"},"OnlyAdminsCanDoThatAction":"Null","VftContractIdNotSet":"Null","ErrorInVFTContract":"Null","ErrorInGetNumOfVarasToSwap":"Null","OperationWasNotPerformed":"Null"}},
-      VftManagerQueryEvents: {"_enum":{"ContractBalanceInVaras":"u128","PoolDetails":{"admins":"Vec<[u8;32]>","name":"String","type_pool":"String","distribution_mode":"String","access_type":"String","participants":"Vec<[u8;32]>","vft_contract_id":"Option<[u8;32]>","transaction_count":"U256","transactions":"Vec<(U256, Transaction)>"},"PendingRewards":{"address":"[u8;32]","total_rewards":"u128","transactions":"Vec<Transaction>"},"Rewards":"Vec<(U256, Transaction, bool)>","UserTotalTokensAsU128":"u128","UserTotalTokens":"U256","TotalTokensToSwap":"U256","TotalTokensToSwapAsU128":"u128","TokensToSwapOneVara":"u128","NumOfTokensForOneVara":"u128","Error":"VftManagerErrors"}},
+      VftManagerQueryEvents: {"_enum":{"ContractBalanceInVaras":"u128","PoolDetails":{"admins":"Vec<[u8;32]>","name":"String","type_pool":"String","distribution_mode":"String","access_type":"String","participants":"Vec<[u8;32]>","vft_contract_id":"Option<[u8;32]>","transaction_count":"U256","transactions":"Vec<(U256, Transaction)>","last_distribution_time":"u64","is_manual":"bool"},"PendingRewards":{"address":"[u8;32]","total_rewards":"u128","transactions":"Vec<Transaction>"},"Rewards":"Vec<(U256, Transaction, bool)>","UserTotalTokensAsU128":"u128","UserTotalTokens":"U256","TotalTokensToSwap":"U256","TotalTokensToSwapAsU128":"u128","TokensToSwapOneVara":"u128","NumOfTokensForOneVara":"u128","Error":"VftManagerErrors"}},
       Transaction: {"destination":"[u8;32]","value":"u128","executed":"bool"},
     }
 
@@ -55,13 +55,13 @@ export class Program {
     this._programId = builder.programId;
     return builder;
   }
-  newWithDataCtorFromCode(code: Uint8Array | Buffer, name: string, type_pool: string, distribution_mode: string, access_type: string, participants: Array<ActorId>, vft_contract_id: ActorId | null, admins: Array<ActorId>): TransactionBuilder<null> {
+  newWithDataCtorFromCode(code: Uint8Array | Buffer, name: string, type_pool: string, distribution_mode: string, access_type: string, participants: Array<ActorId>, vft_contract_id: ActorId | null, admins: Array<ActorId>, last_distribution_time: number | string | bigint, is_manual: boolean, period: number | string | bigint, interval: number | string | bigint): TransactionBuilder<null> {
     const builder = new TransactionBuilder<null>(
       this.api,
       this.registry,
       'upload_program',
-      ['NewWithData', name, type_pool, distribution_mode, access_type, participants, vft_contract_id, admins],
-      '(String, String, String, String, String, Vec<[u8;32]>, Option<[u8;32]>, Vec<[u8;32]>)',
+      ['NewWithData', name, type_pool, distribution_mode, access_type, participants, vft_contract_id, admins, last_distribution_time, is_manual, period, interval],
+      '(String, String, String, String, String, Vec<[u8;32]>, Option<[u8;32]>, Vec<[u8;32]>, u64, bool, u64, u64)',
       'String',
       code,
     );
@@ -70,13 +70,13 @@ export class Program {
     return builder;
   }
 
-  newWithDataCtorFromCodeId(codeId: `0x${string}`, name: string, type_pool: string, distribution_mode: string, access_type: string, participants: Array<ActorId>, vft_contract_id: ActorId | null, admins: Array<ActorId>) {
+  newWithDataCtorFromCodeId(codeId: `0x${string}`, name: string, type_pool: string, distribution_mode: string, access_type: string, participants: Array<ActorId>, vft_contract_id: ActorId | null, admins: Array<ActorId>, last_distribution_time: number | string | bigint, is_manual: boolean, period: number | string | bigint, interval: number | string | bigint) {
     const builder = new TransactionBuilder<null>(
       this.api,
       this.registry,
       'create_program',
-      ['NewWithData', name, type_pool, distribution_mode, access_type, participants, vft_contract_id, admins],
-      '(String, String, String, String, String, Vec<[u8;32]>, Option<[u8;32]>, Vec<[u8;32]>)',
+      ['NewWithData', name, type_pool, distribution_mode, access_type, participants, vft_contract_id, admins, last_distribution_time, is_manual, period, interval],
+      '(String, String, String, String, String, Vec<[u8;32]>, Option<[u8;32]>, Vec<[u8;32]>, u64, bool, u64, u64)',
       'String',
       codeId,
     );
@@ -128,27 +128,27 @@ export class VftManager {
     );
   }
 
-  public distribution(): TransactionBuilder<null> {
+  public addVara(): TransactionBuilder<VftManagerEvents> {
     if (!this._program.programId) throw new Error('Program ID is not set');
-    return new TransactionBuilder<null>(
+    return new TransactionBuilder<VftManagerEvents>(
       this._program.api,
       this._program.registry,
       'send_message',
-      ['VftManager', 'Distribution'],
+      ['VftManager', 'AddVara'],
       '(String, String)',
-      'Null',
+      'VftManagerEvents',
       this._program.programId
     );
   }
 
-  public distributionPoolBalance(): TransactionBuilder<null> {
+  public distribution(manual: boolean): TransactionBuilder<null> {
     if (!this._program.programId) throw new Error('Program ID is not set');
     return new TransactionBuilder<null>(
       this._program.api,
       this._program.registry,
       'send_message',
-      ['VftManager', 'DistributionPoolBalance'],
-      '(String, String)',
+      ['VftManager', 'Distribution', manual],
+      '(String, String, bool)',
       'Null',
       this._program.programId
     );
@@ -163,6 +163,19 @@ export class VftManager {
       ['VftManager', 'RewardsClaimed', address],
       '(String, String, [u8;32])',
       'VftManagerEvents',
+      this._program.programId
+    );
+  }
+
+  public setManualMode(manual: boolean): TransactionBuilder<null> {
+    if (!this._program.programId) throw new Error('Program ID is not set');
+    return new TransactionBuilder<null>(
+      this._program.api,
+      this._program.registry,
+      'send_message',
+      ['VftManager', 'SetManualMode', manual],
+      '(String, String, bool)',
+      'Null',
       this._program.programId
     );
   }

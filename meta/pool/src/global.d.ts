@@ -4,6 +4,7 @@ declare global {
   export type VftManagerEvents = 
     | { newAdminAdded: ActorId }
     | { newParticipant: ActorId }
+    | { addVara: null }
     | { refundOfVaras: number | string | bigint }
     | { vFTContractIdSet: null }
     | { minTokensToAddSet: null }
@@ -34,7 +35,7 @@ declare global {
 
   export type VftManagerQueryEvents = 
     | { contractBalanceInVaras: number | string | bigint }
-    | { poolDetails: { admins: Array<ActorId>; name: string; type_pool: string; distribution_mode: string; access_type: string; participants: Array<ActorId>; vft_contract_id: ActorId | null; transaction_count: number | string | bigint; transactions: Array<[number | string | bigint, Transaction]> } }
+    | { poolDetails: { admins: Array<ActorId>; name: string; type_pool: string; distribution_mode: string; access_type: string; participants: Array<ActorId>; vft_contract_id: ActorId | null; transaction_count: number | string | bigint; transactions: Array<[number | string | bigint, Transaction]>; last_distribution_time: number | string | bigint; is_manual: boolean } }
     | { pendingRewards: { address: ActorId; total_rewards: number | string | bigint; transactions: Array<Transaction> } }
     | { rewards: Array<[number | string | bigint, Transaction, boolean]> }
     | { userTotalTokensAsU128: number | string | bigint }
