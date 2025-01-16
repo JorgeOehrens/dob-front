@@ -65,7 +65,7 @@ function SendVara({ pools }: SendVaraProps) {
       await web3Enable("my dapp");
       const { signer } = await web3FromSource(account.meta.source);
       console.log(selectedPool)
-
+      const Bigamount = BigInt(amount) * 1_000_000_000_000n 
       const response = await sails.command(
         "VftManager/AddVara",
         {
@@ -74,7 +74,7 @@ function SendVara({ pools }: SendVaraProps) {
 
         },
         {
-          tokensToSend: 1_000_000_000_000n, 
+          tokensToSend:Bigamount, 
 
           callbacks: {
             onLoad() {
