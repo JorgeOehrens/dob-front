@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@chakra-ui/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -17,7 +17,7 @@ import { createClient } from "@supabase/supabase-js";
 const supabase = createClient("https://lwmvtiydijytxugorjrd.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3bXZ0aXlkaWp5dHh1Z29yanJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUyNDQ1ODcsImV4cCI6MjA1MDgyMDU4N30.hGCsLUY_N9RyJg0iebs5IgONMhKjv3lMgkuj_zcOZMY");
 
 
-export function CreatePoolForm() {
+export function CreatePoolForm({ fetchPools }: { fetchPools: () => Promise<void> }) {
   const [poolName, setPoolName] = useState("");
   const [poolType, setPoolType] = useState("");
   const [initialAmount, setInitialAmount] = useState("");
@@ -151,6 +151,10 @@ const distributeShares = async (vftAddress: any) => {
           },
           onSuccess() {
             alert.success("Shares successfully distributed!");
+              // Llamar a fetchPools al finalizar exitosamente
+              if (fetchPools) {
+                fetchPools();
+              }
           },
          
         },
@@ -333,7 +337,6 @@ const signer = async () => {
               <SelectValue placeholder="Select the type of access" />
             </SelectTrigger>
             <SelectContent className="select-content">
-              <SelectItem value="public">Public</SelectItem>
               <SelectItem value="private">Private</SelectItem>
             </SelectContent>
           </Select>
@@ -395,7 +398,7 @@ const signer = async () => {
               onChange={(e) => setNewParticipant(e.target.value)}
               placeholder="Add address"
             />
-            <Button onClick={handleAddParticipant}>Add</Button>
+            <Button backgroundColor={"blue.100"} onClick={handleAddParticipant}>Add</Button>
           </div>
           <ul className="list-disc pl-6">
             {calculateShares().map((participant, index) => (
@@ -411,6 +414,7 @@ const signer = async () => {
                     placeholder="Tokens"
                   />
                   <Button
+                  backgroundColor={"red.100"}
                     variant="ghost"
                     size="sm"
                     onClick={() => handleRemoveParticipant(index)}
@@ -430,7 +434,10 @@ const signer = async () => {
         </div>
       </CardContent>
       <CardFooter>
-          <Button onClick={signer}>Create Pool</Button>
+          <Button  
+                    backgroundColor="green.300"
+
+          onClick={signer}  >Create Pool</Button>
       </CardFooter>
     </Card>
   );

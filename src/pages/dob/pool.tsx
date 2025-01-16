@@ -69,7 +69,6 @@ export const Pool = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Dob Protocol UI</h1>
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value)}>
         <div className="overflow-x-auto">
           <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 h-auto">
@@ -107,7 +106,7 @@ export const Pool = () => {
         </div>
 
         <TabsContent value="create-pool">
-          <CreatePoolForm />
+          <CreatePoolForm  fetchPools={fetchPools} />
         </TabsContent>
 
 

@@ -24,7 +24,7 @@ import { CONTRACT_DATA_POOL } from "@/app/consts";
 interface Pool {
   id: string;
   nombre: string;
-  id_vara: string; // Dirección del contrato pool
+  id_vara: string; 
 }
 
 interface SendVaraProps {
@@ -135,8 +135,8 @@ function SendVara({ pools }: SendVaraProps) {
           />
         </div>
         <Button
-          backgroundColor="blue.300"
-          onClick={onClaimClick}
+                    backgroundColor="green.300"
+                    onClick={onClaimClick}
           disabled={!selectedPool || !amount || isNaN(Number(amount))}
         >
           Send VARA
