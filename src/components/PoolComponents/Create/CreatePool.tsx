@@ -5,8 +5,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SailsCalls from "@/app/SailsCalls";
-import { useState, useEffect } from "react";
-import { web3Enable, web3Accounts, web3FromSource } from "@polkadot/extension-dapp";
+import { useState } from "react";
+import { web3Enable,  web3FromSource } from "@polkadot/extension-dapp";
 import { useSailsCalls } from "@/app/hooks";
 import { useAccount, useAlert } from "@gear-js/react-hooks";
 import { useInitSails } from "@/app/hooks";
@@ -16,19 +16,6 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient("https://lwmvtiydijytxugorjrd.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3bXZ0aXlkaWp5dHh1Z29yanJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzUyNDQ1ODcsImV4cCI6MjA1MDgyMDU4N30.hGCsLUY_N9RyJg0iebs5IgONMhKjv3lMgkuj_zcOZMY");
 
-const fetchWasmCode = async () => {
-  try {
-    const response = await fetch("../../../../wasm/factory/wasm.wasm");
-    if (!response.ok) {
-      throw new Error("Error al cargar el archivo WASM");
-    }
-    const code = await response.arrayBuffer();
-    return new Uint8Array(code);
-  } catch (error) {
-    console.error("Error al cargar el WASM:", error);
-    return null;
-  }
-};
 
 export function CreatePoolForm() {
   const [poolName, setPoolName] = useState("");
@@ -39,8 +26,20 @@ export function CreatePoolForm() {
   const [participantsForm, setParticipants] = useState<{ address: string; tokens: number }[]>([]);
   const [newParticipant, setNewParticipant] = useState("");
   const [totalTokens, setTotalTokens] = useState(0);
+  const periodOptions = [
+    { value: "1", label: "Minutes" },
+    { value: "2", label: "Hours" },
+    { value: "3", label: "Semestral" },
+    { value: "4", label: "Annual" },
+  ];
+  const [distributionPeriod, setDistributionPeriod] = useState("");
+  const [interval, setInterval] = useState(1);
+  const [lastDistributionTime, setLastDistributionTime] = useState("");
 
-
+  const handleDateChange = (event:any) => {
+    const dateInMilliseconds = Math.round(new Date(event.target.value).getTime());
+    setLastDistributionTime(dateInMilliseconds.toString());
+  };
   const handleAddParticipant = () => {
     if (newParticipant.trim() !== "") {
       setParticipants((prev) => [
@@ -185,6 +184,7 @@ const signer = async () => {
 
     // Obtener el firmante
     const { signer } = await web3FromSource(account.meta.source);
+    const is_manual= false;
 
     const initConfig = {
       name: poolName,
@@ -194,6 +194,10 @@ const signer = async () => {
       distribution_mode: distributionMode,
       access_type: access,
       participants: participantsForm.map((p) => p.address),
+      last_distribution_time:lastDistributionTime,
+      is_manual:is_manual,
+      period: distributionPeriod,
+      interval: interval
     };
 
     // Crear la VFT y la pool
@@ -346,7 +350,43 @@ const signer = async () => {
             </SelectContent>
           </Select>
         </div>
-
+        
+        <div className="space-y-2">
+          <Label>Period and Interval</Label>
+          <div className="flex items-center space-x-4">
+            <Select
+              value={distributionPeriod}
+              onValueChange={setDistributionPeriod} 
+            >
+            <SelectTrigger id="pediod-mode">
+              <SelectValue placeholder="Select period" />
+              </SelectTrigger>
+              <SelectContent className="select-content">
+              {periodOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Input
+              type="number"
+              value={interval}
+              onChange={(e) => setInterval(Number(e.target.value))}
+              placeholder="Interval"
+              className="w-1/2"
+            />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="last-distribution-time">First Distribution Date</Label>
+          <Input
+            id="last-distribution-time"
+            type="datetime-local"
+            onChange={handleDateChange}
+          />
+          
+        </div>
         <div className="space-y-2">
           <Label>Participants</Label>
           <div className="flex space-x-2">
